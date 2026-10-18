@@ -1,0 +1,90 @@
+/* css/estilos.css - Estilos Centralizados Basados en Clases */
+
+* { box-sizing: border-box; }
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #f0f2f5; 
+    padding: 20px; 
+    margin: 0; 
+    color: #333333; 
+}
+
+.body-center { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 90vh; 
+}
+
+.panel-auth { 
+    background: #ffffff; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    width: 100%; 
+    max-width: 420px; 
+    text-align: center; 
+}
+
+.panel-titulo { margin-top: 0; color: #1a1a1a; }
+.panel-subtitulo { color: #666666; font-size: 14px; margin-bottom: 20px; }
+
+.label-avatar { display: block; text-align: left; font-size: 13px; color: #555555; margin-bottom: 8px; font-weight: bold; }
+
+.avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 15px; }
+
+.avatar-item { font-size: 22px; background: #f8f9fa; border: 2px solid #dddddd; border-radius: 8px; padding: 6px; cursor: pointer; transition: all 0.2s ease; }
+.avatar-item:hover, .avatar-item.seleccionado { border-color: #007bff; background: #e7f0ff; transform: scale(1.08); }
+
+.texto-enlace { margin-top: 15px; font-size: 14px; }
+.texto-enlace a { color: #007bff; text-decoration: none; font-weight: bold; }
+
+.header-bar { background: #ffffff; padding: 15px 25px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.usuario-info-header { display: flex; align-items: center; gap: 12px; }
+.avatar-badge { font-size: 28px; background: #e9ecef; padding: 6px; border-radius: 50%; }
+.header-titulo { margin: 0; font-size: 18px; }
+.rol-badge { background: #007bff; color: #ffffff; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+
+.contenedor-dashboard { max-width: 1000px; margin: 0 auto; text-align: center; }
+.titulo-dashboard { font-size: 28px; margin-bottom: 5px; }
+.subtitulo-dashboard { color: #666666; margin-bottom: 30px; }
+
+.grid-modulos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.tarjeta-modulo { background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; transition: transform 0.2s ease; }
+.tarjeta-modulo:hover { transform: translateY(-5px); }
+.icono-modulo { font-size: 45px; margin-bottom: 15px; }
+
+/* ESTRUCTURA MÓDULO CHAT / BLASTER */
+.chat-container { display: flex; gap: 20px; max-width: 1100px; margin: 0 auto; height: 80vh; }
+.chat-sidebar { width: 300px; background: #ffffff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+.chat-main { flex: 1; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+
+.caja-mensajes { flex: 1; overflow-y: auto; background: #f9f9f9; padding: 15px; border: 1px solid #dddddd; border-radius: 8px; margin-bottom: 15px; }
+
+.item-usuario-chat { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; transition: background 0.2s; }
+.item-usuario-chat:hover, .item-usuario-chat.activo { background: #e7f0ff; }
+
+.mensaje-burbuja { margin-bottom: 12px; padding: 10px; background: #ffffff; border-radius: 8px; border: 1px solid #e0e0e0; max-width: 80%; }
+.mensaje-burbuja.propio { margin-left: auto; background: #d4edda; border-color: #c3e6cb; }
+
+.banner-fijado { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+
+/* COMENTARIOS ANIDADOS BLOG */
+.comentario-padre { margin-bottom: 12px; padding: 10px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; }
+.comentario-hijo { margin-top: 6px; padding: 8px 10px; background: #f8f9fa; border-left: 3px solid #007bff; border-radius: 4px; }
+.contenedor-respuestas { margin-left: 15px; margin-top: 5px; }
+
+/* INPUTS Y BOTONES */
+input, textarea { width: 100%; margin-bottom: 12px; padding: 10px 12px; border: 1px solid #cccccc; border-radius: 6px; font-size: 14px; }
+textarea { resize: vertical; min-height: 90px; }
+
+.btn { padding: 10px 16px; color: #ffffff; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 14px; }
+.btn-block { display: block; width: 100%; text-align: center; }
+.btn-primary { background: #007bff; }
+.btn-primary:hover { background: #0056b3; }
+.btn-success { background: #28a745; }
+.btn-success:hover { background: #218838; }
+.btn-danger { background: #dc3545; }
+.btn-danger:hover { background: #c82333; }
+.btn-sm { padding: 4px 8px; font-size: 11px; margin-left: 5px; }
