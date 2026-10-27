@@ -85,6 +85,16 @@ switch ($accion) {
 
     case 'enviar':
         try {
+            // Verificamos el estado de baneo en tiempo real
+            $stmtCheckBan = $pdo->prepare("SELECT baneado FROM usuarios WHERE id = :id");
+            $stmtCheckBan->execute([':id' => $usuario_id]);
+            $estadoUser = $stmtCheckBan->fetch();
+
+            if ($estadoUser && $estadoUser['baneado'] == 1) {
+                echo json_encode(['error' => true, 'mensaje' => 'Tu cuenta está suspendida. No puedes enviar mensajes.']);
+                exit;
+            }
+
             $data = json_decode(file_get_contents("php://input"), true);
             $mensaje = trim($data['mensaje'] ?? '');
             $destinatarioId = !empty($data['destinatario_id']) ? intval($data['destinatario_id']) : null;
