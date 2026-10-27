@@ -26,9 +26,9 @@ switch ($accion) {
                 exit;
             }
 
-            // Inserción segura con hash de contraseña y rol por defecto 'usuario'
+            // Inserción segura: ROL 'user' (En inglés, como dice la base de datos)
             $passHash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, correo, password, avatar, rol) VALUES (:n, :c, :p, :a, 'usuario')");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, correo, password, avatar, rol) VALUES (:n, :c, :p, :a, 'user')");
             $stmt->execute([
                 ':n' => $nombre,
                 ':c' => $correo,
@@ -84,3 +84,4 @@ switch ($accion) {
         echo json_encode(['error' => true, 'mensaje' => 'Acción no válida']);
         break;
 }
+?>
