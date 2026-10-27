@@ -30,7 +30,7 @@ if (!isset($_SESSION['usuario_id'])) {
         <div id="foro-box">Cargando hilos...</div>
     </div>
 
-    <script src="js/foro.js"></script>
+    <script src="js/foro.js?v=2"></script>
     <script>cargarHilos();</script>
 </body>
 </html>
