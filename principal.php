@@ -63,7 +63,11 @@ if ($userBan && $userBan['baneado'] == 1) {
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script>verificarAccesoPrincipal();</script>
+        <script src="js/auth.js"></script>
+        <script>
+            verificarAccesoPrincipal();
+            // Verifica la sesión cada 10 segundos por si el usuario fue baneado
+            setInterval(verificarAccesoPrincipal, 10000); 
+        </script>
 </body>
 </html>
