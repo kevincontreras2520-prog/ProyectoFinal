@@ -16,12 +16,15 @@ function cargarPosts() {
     fetch('api/index.php?modulo=blog&accion=leer', { credentials: 'include' })
         .then(res => res.json())
         .then(response => {
-            const posts = response.posts || response;
-            if (!Array.isArray(posts)) return;
+            if (response.error) {
+                document.getElementById('blog-box').innerHTML = '<p style="color:red;">Error al cargar datos.</p>';
+                return;
+            }
 
-            // Guardamos si el usuario actual es admin
+            // Como PHP ahora envía { posts: [...], es_admin: true/false }, lo leemos así:
+            const posts = response.posts || [];
             esAdminGlobal = response.es_admin || false;
-
+            
             const caja = document.getElementById('blog-box');
             if (!caja) return;
             caja.innerHTML = '';
@@ -30,6 +33,7 @@ function cargarPosts() {
                 caja.innerHTML = '<p style="text-align:center; color:gray;">No hay publicaciones aún. ¡Sé el primero en escribir!</p>';
                 return;
             }
+            // ... el resto del código sigue igual
 
             posts.forEach(post => {
                 const contenidoFormateado = escaparHTML(post.contenido).replace(/\n/g, '<br>');
