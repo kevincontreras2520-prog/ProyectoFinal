@@ -42,7 +42,7 @@ if ($userBan && $userBan['baneado'] == 1) {
             <div id="chat-box" class="caja-mensajes">Cargando mensajes...</div>
 
             <div style="display:flex; gap:10px;">
-                <input type="text" id="chat-input" placeholder="Escribe un mensaje..." style="margin:0;">
+                <input type="text" id="chat-input" placeholder="Escribe un mensaje..." style="margin:0;" onkeypress="if(event.key === 'Enter') enviarMensaje()">
                 <button onclick="enviarMensaje()" class="btn btn-primary">Enviar</button>
             </div>
         </div>
