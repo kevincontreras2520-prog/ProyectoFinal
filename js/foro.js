@@ -2,8 +2,10 @@ let temaActualId = null;
 
 function cargarHilos() {
     // Ocultar la vista de respuestas y mostrar la lista de temas
-    document.getElementById('vista-temas').style.display = 'block';
-    document.getElementById('vista-respuestas').style.display = 'none';
+    const vistaTemas = document.getElementById('vista-temas');
+    const vistaRespuestas = document.getElementById('vista-respuestas');
+    if (vistaTemas) vistaTemas.style.display = 'block';
+    if (vistaRespuestas) vistaRespuestas.style.display = 'none';
 
     fetch('api/index.php?modulo=foro&accion=leer', { credentials: 'include' })
         .then(res => res.json())
@@ -16,12 +18,20 @@ function cargarHilos() {
             
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
+                    // Usamos data-titulo para no romper el HTML con títulos especiales
                     caja.innerHTML += `
-                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'" onclick="abrirTema(${hilo.id}, '${hilo.titulo.replace(/'/g, "\\'")}')">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h3 style="margin: 0; color: #007bff;">${hilo.titulo}</h3>
-                                <button onclick="event.stopPropagation(); borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️ Borrar</button>
+                        <div class="tarjeta-post" style="padding: 15px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <!-- El clic para abrir el tema está en el título -->
+                                <h3 style="margin: 0; color: #007bff; flex: 1;" onclick="abrirTema(${hilo.id}, this.innerText)">${hilo.titulo}</h3>
+                                
+                                <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                                    <button onclick="abrirTema(${hilo.id}, this.parentElement.parentElement.querySelector('h3').innerText)" class="btn btn-primary btn-sm">💬 Ver Hilo</button>
+                                    <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>
+                                </div>
                             </div>
+
                             <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${hilo.contenido}</p>
                             <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${hilo.nombre || hilo.autor}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
@@ -92,6 +102,7 @@ function volverATemas() {
 
 function cargarRespuestas(tema_id) {
     const caja = document.getElementById('lista-respuestas');
+    if (!caja) return;
     caja.innerHTML = '<p style="color:gray;">Cargando respuestas...</p>';
 
     fetch(`api/index.php?modulo=foro&accion=leer_respuestas&tema_id=${tema_id}`, { credentials: 'include' })
