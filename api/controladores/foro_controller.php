@@ -30,8 +30,16 @@ switch ($accion) {
         $user = $stmt->fetch();
         
         if ($user['rol'] === 'admin') {
+            $hilo_id = intval($data['hilo_id']);
+
+            // 1. Borrar las respuestas del tema primero
+            $delRespuestas = $pdo->prepare("DELETE FROM comentarios WHERE tema_id = :id AND modulo = 'foro'");
+            $delRespuestas->execute([':id' => $hilo_id]);
+
+            // 2. Borrar el tema
             $del = $pdo->prepare("DELETE FROM temas WHERE id = :id");
-            $del->execute([':id' => intval($data['hilo_id'])]);
+            $del->execute([':id' => $hilo_id]);
+            
             echo json_encode(['error' => false]);
         } else {
             echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
