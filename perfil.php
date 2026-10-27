@@ -24,6 +24,7 @@ if (!isset($_SESSION['usuario_id'])) {
             <div class="avatar-item" onclick="seleccionarAvatar('🤖')">🤖</div>
             <div class="avatar-item" onclick="seleccionarAvatar('🦊')">🦊</div>
             <div class="avatar-item" onclick="seleccionarAvatar('🐱')">🐱</div>
+            <div class="avatar-item" onclick="seleccionarAvatar('😜')">😜</div>
         </div>
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
