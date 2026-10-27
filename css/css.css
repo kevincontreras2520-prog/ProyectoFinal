@@ -55,8 +55,17 @@ body {
 .tarjeta-modulo:hover { transform: translateY(-5px); }
 .icono-modulo { font-size: 45px; margin-bottom: 15px; }
 
-/* ESTRUCTURA MÓDULO CHAT / BLASTER */
-.chat-container { display: flex; gap: 20px; max-width: 1100px; margin: 0 auto; height: 80vh; }
+/* =========================================
+   ESTRUCTURA MÓDULO CHAT (CORREGIDO)
+   ========================================= */
+.chat-container { 
+    display: flex; 
+    gap: 20px; 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    height: 80vh; /* Altura fija para todo el chat */
+}
+
 .chat-sidebar { 
     width: 300px; 
     background: #ffffff; 
@@ -65,37 +74,27 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
     display: flex; 
     flex-direction: column; 
-    height: 80vh; /* Le damos altura fija al panel */
-    overflow: hidden; /* Evita que se salga del cuadro */
+    height: 100%; /* Obliga a que ocupe el 80vh completo */
+    overflow: hidden; /* Evita que los usuarios se salgan del cuadro blanco */
 }
+
+.chat-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+#lista-usuarios {
+    flex: 1; /* Toma todo el espacio disponible debajo del título */
+    overflow-y: auto; /* Agrega scroll interno SOLO a la lista de contactos */
+    padding-right: 5px;
+}
+
+/* Scroll estético para la lista de contactos */
 #lista-usuarios::-webkit-scrollbar { width: 6px; }
 #lista-usuarios::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
-.chat-main { flex: 1; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
-.caja-mensajes { 
-    flex: 1; 
-    overflow-y: auto; 
-    background: #f9f9f9; 
-    padding: 15px; 
-    border: 1px solid #dddddd; 
-    border-radius: 8px; 
-    margin-bottom: 15px; 
-    display: flex; /* Esto hace que los mensajes fluyan bien */
-    flex-direction: column;
-}
-
-
-.user-info {
-    flex: 1;
-    min-width: 0;
-}
-.user-info b {
-    display: block;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis; /* Si el nombre es muy largo, pone "..." */
-    font-size: 14px;
-}
 .item-usuario-chat { 
     display: flex; 
     align-items: center; 
@@ -107,9 +106,52 @@ body {
     transition: background 0.2s; 
 }
 .item-usuario-chat:hover, .item-usuario-chat.activo { background: #e7f0ff; }
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+.user-info b {
+    display: block;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    font-size: 14px;
+}
+
+.chat-main { 
+    flex: 1; 
+    background: #ffffff; 
+    border-radius: 10px; 
+    padding: 20px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%;
+    overflow: hidden;
+}
+
+.chat-main h2 {
+    margin-top: 0;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.caja-mensajes { 
+    flex: 1; 
+    overflow-y: auto; 
+    background: #f9f9f9; 
+    padding: 15px; 
+    border: 1px solid #dddddd; 
+    border-radius: 8px; 
+    margin-bottom: 15px; 
+    display: flex; 
+    flex-direction: column;
+}
+
 .mensaje-burbuja { 
     margin-bottom: 12px; 
-    padding: 8px 12px; 
+    padding: 10px 14px; 
     background: #ffffff; 
     border-radius: 8px; 
     border: 1px solid #e0e0e0; 
@@ -117,7 +159,7 @@ body {
     line-height: 1.4;
     font-size: 14px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    word-wrap: break-word; /* Evita que palabras largas rompan la burbuja */
+    word-wrap: break-word; 
 }
 
 .mensaje-burbuja.propio { 
@@ -125,32 +167,22 @@ body {
     background: #d4edda; 
     border-color: #c3e6cb; 
 }
+
 .mensaje-burbuja small {
     display: block;
     margin-bottom: 3px;
     color: #555;
 }
 
-.banner-fijado { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
-
-/* COMENTARIOS ANIDADOS BLOG */
-.comentario-padre { margin-bottom: 12px; padding: 10px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; }
-.comentario-hijo { margin-top: 6px; padding: 8px 10px; background: #f8f9fa; border-left: 3px solid #007bff; border-radius: 4px; }
-.contenedor-respuestas { margin-left: 15px; margin-top: 5px; }
-
-/* INPUTS Y BOTONES */
-input, textarea { width: 100%; margin-bottom: 12px; padding: 10px 12px; border: 1px solid #cccccc; border-radius: 6px; font-size: 14px; }
-textarea { resize: vertical; min-height: 90px; }
-
-.btn { padding: 10px 16px; color: #ffffff; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 14px; }
-.btn-block { display: block; width: 100%; text-align: center; }
-.btn-primary { background: #007bff; }
-.btn-primary:hover { background: #0056b3; }
-.btn-success { background: #28a745; }
-.btn-success:hover { background: #218838; }
-.btn-danger { background: #dc3545; }
-.btn-danger:hover { background: #c82333; }
-.btn-sm { padding: 4px 8px; font-size: 11px; margin-left: 5px; }
+.banner-fijado { 
+    background: #fff3cd; 
+    border: 1px solid #ffeeba; 
+    color: #856404; 
+    padding: 10px; 
+    border-radius: 6px; 
+    margin-bottom: 10px; 
+    font-size: 13px; 
+}
 
 /* =========================================
    DISEÑO MODERNO PARA EL BLOG
@@ -263,7 +295,7 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 .input-comentario input {
-    margin-bottom: 0; /* Quitar el margen por defecto de los inputs */
+    margin-bottom: 0; 
     background: #fff;
 }
 
@@ -286,3 +318,19 @@ textarea { resize: vertical; min-height: 90px; }
     border-radius: 0 6px 6px 0;
     font-size: 13px;
 }
+
+/* =========================================
+   INPUTS Y BOTONES GLOBALES
+   ========================================= */
+input, textarea { width: 100%; margin-bottom: 12px; padding: 10px 12px; border: 1px solid #cccccc; border-radius: 6px; font-size: 14px; }
+textarea { resize: vertical; min-height: 90px; }
+
+.btn { padding: 10px 16px; color: #ffffff; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 14px; }
+.btn-block { display: block; width: 100%; text-align: center; }
+.btn-primary { background: #007bff; }
+.btn-primary:hover { background: #0056b3; }
+.btn-success { background: #28a745; }
+.btn-success:hover { background: #218838; }
+.btn-danger { background: #dc3545; }
+.btn-danger:hover { background: #c82333; }
+.btn-sm { padding: 4px 8px; font-size: 11px; margin-left: 5px; }
