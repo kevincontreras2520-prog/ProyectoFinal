@@ -63,7 +63,7 @@ function cargarPosts() {
                             <div class="post-avatar">${post.avatar || '👤'}</div>
                             <div class="post-info">
                                 <b>${escaparHTML(post.nombre || post.autor)}</b>
-                                <small>${post.fecha_creacion}</small>
+                                <small>${tiempoHumano(post.fecha_creacion)}</small>
                             </div>
                         </div>
                         
