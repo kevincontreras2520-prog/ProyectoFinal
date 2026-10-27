@@ -2,6 +2,22 @@ let cachePosts = '';
 let cacheComentarios = {};
 let esAdminGlobal = false; // Variable global para saber si es admin
 
+function tiempoHumano(fechaStr) {
+    if (!fechaStr) return '';
+    // Convertimos la fecha de MySQL a un formato que JS entienda
+    const fecha = new Date(fechaStr.replace(' ', 'T')); 
+    const ahora = new Date();
+    const diffMs = ahora - fecha;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHoras = Math.floor(diffMins / 60);
+
+    if (diffMins < 1) return 'Hace un momento';
+    if (diffMins < 60) return `Hace ${diffMins} min`;
+    if (diffHoras < 24) return `Hace ${diffHoras} horas`;
+    
+    // Si pasó más de un día, mostramos la fecha normal
+    return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 // Función para evitar inyección de código (XSS)
 function escaparHTML(str) {
     return String(str || '').replace(/[&<>"']/g, function(m) {
