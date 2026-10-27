@@ -26,12 +26,12 @@ switch ($accion) {
     case 'crear':
         $data = json_decode(file_get_contents("php://input"), true);
         if (!empty($data['titulo']) && !empty($data['contenido'])) {
-            $stmt = $pdo->prepare("INSERT INTO temas (usuario_id, titulo, contenido) VALUES (:u, :t, :c)");
-            $stmt->execute([':u' => $usuario_id, ':t' => $data['titulo'], ':c' => $data['contenido']]);
-            echo json_encode(['error' => false]);
-        } else {
-            echo json_encode(['error' => true, 'mensaje' => 'Campos vacíos']);
+            // Validar longitud
+            if (strlen($data['titulo']) > 255 || strlen($data['contenido']) > 5000) {
+            echo json_encode(['error' => true, 'mensaje' => 'El texto es demasiado largo.']);
+            break;
         }
+        $stmt = $pdo->prepare("INSERT INTO publicaciones ...");
         break;
 
     case 'borrar':
