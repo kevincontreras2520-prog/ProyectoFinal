@@ -21,13 +21,15 @@ function cargarHilos() {
             const caja = document.getElementById('foro-box');
             if (!caja) return;
 
-            // Guardamos si el usuario actual es admin
+            // Ya lo tenías bien en tu último mensaje, pero asegúrate de que esté así:
             esAdminGlobal = data.es_admin || false;
-
+            const hilos = data.hilos || [];
+            
             caja.innerHTML = '';
             
-            if (data.hilos && data.hilos.length > 0) {
-                data.hilos.forEach(hilo => {
+            if (hilos.length > 0) {
+                hilos.forEach(hilo => {
+                    // ... resto del código
                     // Lógica del botón de borrar tema
                     const btnBorrarHilo = esAdminGlobal ? `<button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>` : '';
 
