@@ -18,8 +18,13 @@ $accion = $_GET['accion'] ?? '';
 switch ($accion) {
     case 'usuarios':
         try {
-            $stmt = $pdo->prepare("SELECT id, nombre, avatar, rol, baneado FROM usuarios WHERE id != :id");
-            $stmt->execute([':id' => $usuario_id]);
+            // Consulta para saber cuántos mensajes nuevos tiene el usuario actual
+            $sql = "SELECT u.id, u.nombre, u.avatar, u.rol, u.baneado,
+                    (SELECT COUNT(*) FROM mensajes m WHERE m.usuario_id = u.id AND m.destinatario_id = :yo AND m.leido = 0) as no_leidos
+                    FROM usuarios u WHERE u.id != :id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':yo' => $usuario_id, ':id' => $usuario_id]);
+            
             echo json_encode([
                 'error' => false, 
                 'usuarios' => $stmt->fetchAll(), 
