@@ -48,5 +48,34 @@ switch ($accion) {
             echo json_encode(['error' => true, 'mensaje' => 'Datos incompletos']);
         }
         break;
+        case 'borrar_post':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
+        $stmt->execute([':u' => $usuario_id]);
+        $user = $stmt->fetch();
+        
+        if ($user['rol'] === 'admin') {
+            $del = $pdo->prepare("DELETE FROM publicaciones WHERE id = :id");
+            $del->execute([':id' => intval($data['post_id'])]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
+        }
+        break;
+
+    case 'borrar_comentario':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
+        $stmt->execute([':u' => $usuario_id]);
+        $user = $stmt->fetch();
+        
+        if ($user['rol'] === 'admin') {
+            $del = $pdo->prepare("DELETE FROM comentarios WHERE id = :id");
+            $del->execute([':id' => intval($data['comentario_id'])]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
+        }
+        break;
 }
 ?>
