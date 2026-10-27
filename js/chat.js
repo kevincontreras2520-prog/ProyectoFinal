@@ -181,6 +181,7 @@ function enviarMensaje() {
             cargarMensajes();
         } else {
             alert(data.mensaje);
+            input.value = ''; 
         }
     });
 }
