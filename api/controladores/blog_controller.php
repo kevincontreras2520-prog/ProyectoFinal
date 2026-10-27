@@ -6,11 +6,21 @@ $accion = $_GET['accion'] ?? '';
 
 switch ($accion) {
     case 'leer':
-        // Leemos de la tabla 'publicaciones' y usamos 'creado_en'
+        // Verificar si el usuario actual es admin
+        $stmtUser = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :id");
+        $stmtUser->execute([':id' => $usuario_id]);
+        $currentUser = $stmtUser->fetch();
+        $es_admin = ($currentUser && $currentUser['rol'] === 'admin');
+
         $stmt = $pdo->query("SELECT p.id, p.titulo, p.contenido, p.creado_en AS fecha_creacion, u.nombre, u.avatar 
                              FROM publicaciones p JOIN usuarios u ON p.usuario_id = u.id 
                              ORDER BY p.creado_en DESC");
-        echo json_encode(['error' => false, 'posts' => $stmt->fetchAll()]);
+        
+        echo json_encode([
+            'error' => false, 
+            'posts' => $stmt->fetchAll(),
+            'es_admin' => $es_admin // Enviamos si es admin al frontend
+        ]);
         break;
 
     case 'crear':
