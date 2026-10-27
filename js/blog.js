@@ -35,7 +35,10 @@ function cargarPosts() {
                         </div>
                         
                         <div class="post-body">
-                            <h3 class="post-titulo">${post.titulo}</h3>
+                            <!-- Título corregido y botón de borrar post -->
+                            <h3 class="post-titulo">${post.titulo} 
+                                <button onclick="borrarPost(${post.id})" class="btn btn-danger btn-sm" style="float: right;">🗑️ Borrar Post</button>
+                            </h3>
                             <p class="post-contenido">${contenidoFormateado}</p>
                         </div>
                         
@@ -64,9 +67,11 @@ function cargarComentarios(postId) {
             caja.innerHTML = '';
 
             comentarios.forEach(com => {
+                // Botón para borrar comentario principal
                 caja.innerHTML += `
                     <div class="comentario-padre">
                         <b>${com.avatar || '👤'} ${com.nombre}:</b> ${com.contenido}
+                        <button onclick="borrarComentario(${com.id}, ${postId})" class="btn btn-danger btn-sm" style="float: right; padding: 0 5px; font-size: 10px; line-height: 1.5;">x</button>
                     </div>`;
             });
         });
@@ -116,6 +121,48 @@ function crearPost() {
             document.getElementById('blog-titulo').value = '';
             document.getElementById('blog-contenido').value = '';
             cargarPosts();
+        }
+    });
+}
+
+// ==========================================
+// FUNCIONES NUEVAS PARA ELIMINAR (ADMIN)
+// ==========================================
+
+function borrarPost(id) {
+    if (!confirm("¿Eliminar esta publicación permanentemente?")) return;
+    
+    fetch('api/index.php?modulo=blog&accion=borrar_post', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        credentials: 'include',
+        body: JSON.stringify({ post_id: id })
+    })
+    .then(res => res.json())
+    .then(data => { 
+        if (!data.error) {
+            cargarPosts(); 
+        } else {
+            alert(data.mensaje); // Si no es admin, le saltará alerta de "No autorizado"
+        }
+    });
+}
+
+function borrarComentario(id, postId) {
+    if (!confirm("¿Eliminar este comentario?")) return;
+    
+    fetch('api/index.php?modulo=blog&accion=borrar_comentario', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        credentials: 'include',
+        body: JSON.stringify({ comentario_id: id })
+    })
+    .then(res => res.json())
+    .then(data => { 
+        if (!data.error) {
+            cargarComentarios(postId); 
+        } else {
+            alert(data.mensaje);
         }
     });
 }
