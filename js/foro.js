@@ -10,10 +10,13 @@ function cargarHilos() {
             
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
+                    // Usamos position:relative en el contenedor y absolute en el botón para que quede fijo arriba a la derecha
                     caja.innerHTML += `
-                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
-                            <h3 style="margin-top:0;">${hilo.titulo}</h3>
-                            <p>${hilo.contenido}</p>
+                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd; position:relative;">
+                            <h3 style="margin-top:0; padding-right:90px;">${hilo.titulo}</h3>
+                            <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm" style="position:absolute; top:15px; right:15px;">🗑️ Borrar</button>
+                            
+                            <p style="margin-bottom: 10px;">${hilo.contenido}</p>
                             <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${hilo.nombre || hilo.autor}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
                 });
@@ -43,6 +46,29 @@ function crearHilo() {
             cargarHilos();
         } else {
             alert(data.mensaje || "Error al crear el tema.");
+        }
+    });
+}
+
+// ==========================================
+// FUNCIÓN NUEVA PARA ELIMINAR (ADMIN)
+// ==========================================
+
+function borrarHilo(id) {
+    if (!confirm("¿Eliminar este tema del foro permanentemente?")) return;
+    
+    fetch('api/index.php?modulo=foro&accion=borrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ hilo_id: id })
+    })
+    .then(res => res.json())
+    .then(data => { 
+        if (!data.error) {
+            cargarHilos(); 
+        } else {
+            alert(data.mensaje); // Saltará si un usuario normal intenta borrar
         }
     });
 }
