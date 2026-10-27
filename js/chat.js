@@ -24,11 +24,11 @@ function cargarUsuarios() {
                 data.usuarios.forEach(u => {
                     if (u.id == data.usuario_actual_id) return;
                     
-                    let adminBtns = '';
-                    if (data.es_admin && u.rol !== 'admin') {
-                        const esBaneado = parseInt(u.baneado) === 1;
-                        adminBtns = `<button onclick="event.stopPropagation(); banearUsuario(${u.id}, ${esBaneado ? 0 : 1})" class="btn btn-danger btn-sm">${esBaneado ? 'Restablecer' : 'Banear'}</button>`;
-                    }
+                    let // Reemplaza la línea original de adminBtns por esta:
+adminBtns = `
+    <button onclick="event.stopPropagation(); banearUsuario(${u.id}, ${esBaneado ? 0 : 1})" class="btn btn-primary btn-sm" style="padding: 2px 6px; font-size: 10px;">${esBaneado ? 'Activar' : 'Banear'}</button>
+    <button onclick="event.stopPropagation(); eliminarUsuario(${u.id})" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px; margin-left: 3px;">🗑️</button>
+`;
 
                     const esSeleccionado = chatActivo.tipo === 'private' && chatActivo.destinatarioId == u.id;
 
@@ -175,4 +175,19 @@ function banearUsuario(id, estado) {
         credentials: 'include',
         body: JSON.stringify({ sub_accion: 'toggle_ban', usuario_id: id, baneado: estado })
     }).then(() => cargarUsuarios());
+}
+function eliminarUsuario(id) {
+    if (!confirm("¿Estás seguro de eliminar esta cuenta? Se borrarán todos sus mensajes, posts y comentarios.")) return;
+    
+    fetch('api/index.php?modulo=chat&accion=admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ sub_accion: 'borrar_usuario', usuario_id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.error) alert(data.mensaje);
+        else cargarUsuarios();
+    });
 }
