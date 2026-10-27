@@ -46,7 +46,7 @@ switch ($accion) {
         }
         break;
 
-    // NUEVO: Leer las respuestas de un tema
+    // Leer las respuestas de un tema
     case 'leer_respuestas':
         $tema_id = intval($_GET['tema_id'] ?? 0);
         $stmt = $pdo->prepare("SELECT c.id, c.comentario AS contenido, c.creado_en AS fecha_creacion, u.nombre, u.avatar
@@ -56,7 +56,7 @@ switch ($accion) {
         echo json_encode(['error' => false, 'respuestas' => $stmt->fetchAll()]);
         break;
 
-    // NUEVO: Crear una respuesta
+    // Crear una respuesta
     case 'crear_respuesta':
         $data = json_decode(file_get_contents("php://input"), true);
         $tema_id = intval($data['tema_id'] ?? 0);
@@ -68,6 +68,22 @@ switch ($accion) {
             echo json_encode(['error' => false]);
         } else {
             echo json_encode(['error' => true, 'mensaje' => 'El mensaje no puede estar vacío']);
+        }
+        break;
+
+    // NUEVO: Borrar una respuesta individual
+    case 'borrar_respuesta':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
+        $stmt->execute([':u' => $usuario_id]);
+        $user = $stmt->fetch();
+        
+        if ($user['rol'] === 'admin') {
+            $del = $pdo->prepare("DELETE FROM comentarios WHERE id = :id AND modulo = 'foro'");
+            $del->execute([':id' => intval($data['comentario_id'])]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
         }
         break;
 }
