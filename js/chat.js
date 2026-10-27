@@ -141,7 +141,10 @@ function cargarMensajes() {
                         <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
                             <small><b>${msg.avatar || '👤'} ${escaparHTML(msg.nombre)}</b></small>
                             <div>${escaparHTML(msg.mensaje)}</div>
-                            ${adminAcciones ? `<div style="margin-top: 5px; text-align: right;">${adminAcciones}</div>` : ''}
+                            <div style="text-align: right; margin-top: 4px;">
+                                <small style="color: #888; font-size: 11px;">${tiempoHumano(msg.enviado_en)}</small>
+                                ${adminAcciones}
+                            </div>
                         </div>`;
                 });
                 caja.scrollTop = caja.scrollHeight;
