@@ -60,7 +60,7 @@ function cerrarSesion() {
         .then(res => res.json())
         .then(data => {
             alert(data.mensaje);
-            window.location.href = 'login.html';
+            window.location.href = 'login.php';
         });
 }
 
