@@ -24,5 +24,19 @@ switch ($accion) {
             echo json_encode(['error' => true, 'mensaje' => 'Campos vacíos']);
         }
         break;
+        case 'borrar':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
+        $stmt->execute([':u' => $usuario_id]);
+        $user = $stmt->fetch();
+        
+        if ($user['rol'] === 'admin') {
+            $del = $pdo->prepare("DELETE FROM temas WHERE id = :id");
+            $del->execute([':id' => intval($data['hilo_id'])]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
+        }
+        break;
 }
 ?>
