@@ -11,12 +11,15 @@ function cargarHilos() {
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
                     caja.innerHTML += `
-                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd; position:relative;">
-                            <h3 style="margin-top:0; padding-right:100px;">${hilo.titulo}</h3>
+                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
                             
-                            <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm" style="position:absolute; top:15px; right:15px; font-size: 12px; padding: 4px 8px;">🗑️ Borrar</button>
+                            <!-- Usamos Flexbox para que el título y el botón se acomoden solos -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <h3 style="margin: 0; color: #1a1a1a;">${hilo.titulo}</h3>
+                                <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm" style="flex-shrink: 0; margin-left: 15px;">🗑️ Borrar</button>
+                            </div>
                             
-                            <p style="margin-bottom: 10px;">${hilo.contenido}</p>
+                            <p style="margin-top: 0; margin-bottom: 10px; color: #444; line-height: 1.5;">${hilo.contenido}</p>
                             <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${hilo.nombre || hilo.autor}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
                 });
