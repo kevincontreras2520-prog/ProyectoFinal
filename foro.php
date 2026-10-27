@@ -12,7 +12,6 @@ if (!isset($_SESSION['usuario_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo de Foro</title>
     <link rel="stylesheet" href="css/css.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
     <div class="header-bar">
@@ -20,19 +19,42 @@ if (!isset($_SESSION['usuario_id'])) {
         <a href="principal.php" class="btn btn-primary">⬅ Volver al Menú</a>
     </div>
 
-    <div style="max-width:900px; margin:0 auto;">
-        <div style="background:#fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-            <h3>Crear nuevo Hilo de Debate</h3>
-            <input type="text" id="foro-titulo" placeholder="Título del debate">
-            <textarea id="foro-contenido" placeholder="Explica tu tema..."></textarea>
-            <button onclick="crearHilo()" class="btn btn-success">Publicar Hilo</button>
+    <div class="contenedor-principal">
+        
+        <!-- VISTA 1: LISTA DE TEMAS -->
+        <div id="vista-temas">
+            <div class="tarjeta-formulario">
+                <h3 class="titulo-seccion">Crear nuevo Tema de Debate</h3>
+                <input type="text" id="foro-titulo" placeholder="Título del debate" maxlength="255">
+                <textarea id="foro-contenido" placeholder="Explica tu tema..." maxlength="2000"></textarea>
+                <button onclick="crearHilo()" class="btn btn-success btn-block">Publicar Tema</button>
+            </div>
+
+            <h2 class="titulo-seccion">Temas de Discusión</h2>
+            <div id="foro-box">Cargando temas...</div>
         </div>
 
-        <h2>Hilos de Discusión</h2>
-        <div id="foro-box">Cargando hilos...</div>
+        <!-- VISTA 2: RESPUESTAS DE UN TEMA -->
+        <div id="vista-respuestas" style="display:none;">
+            <button onclick="volverATemas()" class="btn btn-primary" style="margin-bottom: 15px;">⬅ Volver a los Temas</button>
+            
+            <div class="tarjeta-formulario">
+                <h3 id="titulo-tema-actual" class="titulo-seccion" style="color: #007bff;">Tema</h3>
+                <div id="lista-respuestas" style="margin-bottom: 20px;"></div>
+                
+                <hr style="border:0; border-top:1px solid #eee; margin: 20px 0;">
+                
+                <h4>Tu Respuesta:</h4>
+                <textarea id="nueva-respuesta" placeholder="Escribe tu respuesta aquí..." maxlength="1000"></textarea>
+                <button onclick="enviarRespuesta()" class="btn btn-primary btn-block">Enviar Respuesta</button>
+            </div>
+        </div>
+
     </div>
 
-    <script src="js/foro.js?v=2"></script>
-    <script>cargarHilos();</script>
+    <script src="js/foro.js"></script>
+    <script>
+        cargarHilos();
+    </script>
 </body>
 </html>
