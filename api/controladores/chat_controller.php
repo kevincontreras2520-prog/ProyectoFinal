@@ -114,6 +114,9 @@ switch ($accion) {
         } elseif ($subAccion === 'toggle_ban') {
             $stmt = $pdo->prepare("UPDATE usuarios SET baneado = :b WHERE id = :u");
             $stmt->execute([':b' => intval($data['baneado']), ':u' => intval($data['usuario_id'])]);
+        } elseif ($subAccion === 'borrar_usuario') {
+            $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id");
+            $stmt->execute([':id' => intval($data['usuario_id'])]);
         }
         echo json_encode(['error' => false]);
         break;
