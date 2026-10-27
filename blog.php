@@ -1,5 +1,4 @@
 <?php
-
 require_once 'config/conexion.php';
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
@@ -11,29 +10,35 @@ if (!isset($_SESSION['usuario_id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Blog - Proyecto Final</title>
-    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/css.css">
 </head>
 <body>
     <div class="header-bar">
-        <h2>📚 Módulo de Blog</h2>
+        <h2>📰 Módulo de Blog</h2>
         <a href="principal.php" class="btn btn-primary">⬅ Volver al Menú</a>
     </div>
 
-    <div style="max-width:900px; margin:0 auto; padding: 20px;">
-        <div style="background:#fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-            <h3>Publicar un Post</h3>
-            <input type="text" id="blog-titulo" placeholder="Título del artículo" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-            <textarea id="blog-contenido" placeholder="Escribe tu artículo..." style="width: 100%; height: 100px; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-            <button onclick="crearPost()" class="btn btn-success">Publicar Artículo</button>
+    <div class="contenedor-principal">
+        
+        <!-- Formulario para crear post -->
+        <div class="tarjeta-formulario">
+            <h3 class="titulo-seccion">¿Qué estás pensando?</h3>
+            <input type="text" id="blog-titulo" placeholder="Título llamativo para tu artículo" maxlength="255">
+            <textarea id="blog-contenido" placeholder="Escribe el contenido de tu artículo aquí..." maxlength="5000"></textarea>
+            <button onclick="crearPost()" class="btn btn-success btn-block">Publicar Artículo</button>
         </div>
 
-        <h2>Publicaciones Recientes</h2>
-        <div id="blog-box">Cargando publicaciones...</div>
+        <h2 class="titulo-seccion" style="text-align: left; margin-top: 30px;">Publicaciones Recientes</h2>
+        
+        <!-- Contenedor de Posts -->
+        <div id="blog-box">
+            <p style="text-align:center; color:gray;">Cargando publicaciones...</p>
+        </div>
+
     </div>
 
     <script src="js/blog.js"></script>
     <script>
-        // Iniciar la carga de posts
         if (typeof cargarPosts === 'function') {
             cargarPosts();
         }
