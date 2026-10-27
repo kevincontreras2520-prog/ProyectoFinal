@@ -54,8 +54,16 @@ switch ($accion) {
         $user = $stmt->fetch();
         
         if ($user['rol'] === 'admin') {
+            $post_id = intval($data['post_id']);
+            
+            // 1. Borrar los comentarios del post primero
+            $delComentarios = $pdo->prepare("DELETE FROM comentarios WHERE tema_id = :id AND modulo = 'blog'");
+            $delComentarios->execute([':id' => $post_id]);
+
+            // 2. Borrar el post
             $del = $pdo->prepare("DELETE FROM publicaciones WHERE id = :id");
-            $del->execute([':id' => intval($data['post_id'])]);
+            $del->execute([':id' => $post_id]);
+            
             echo json_encode(['error' => false]);
         } else {
             echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
