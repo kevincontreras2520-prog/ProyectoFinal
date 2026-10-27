@@ -23,7 +23,6 @@
             <div class="avatar-item" onclick="seleccionarAvatar('🤖')">🤖</div>
             <div class="avatar-item" onclick="seleccionarAvatar('🦊')">🦊</div>
             <div class="avatar-item" onclick="seleccionarAvatar('🐱')">🐱</div>
-            <div class="avatar-item" onclick="seleccionarAvatar('👑')">👑</div>
         </div>
         
         <button onclick="registrarUsuario()" class="btn btn-success btn-block">Registrarse</button>
