@@ -43,13 +43,18 @@ function cargarUsuarios() {
                     }
 
                     const esSeleccionado = chatActivo.tipo === 'private' && chatActivo.destinatarioId == u.id;
+                    
+                    // --- NUEVO: Lógica para saber si hay mensajes sin leer ---
+                    const tieneNoLeidos = parseInt(u.no_leidos) > 0;
+                    const estiloNombre = tieneNoLeidos ? 'font-weight: 900; color: #000;' : 'font-weight: normal;';
 
                     html += `
                         <div class="item-usuario-chat ${esSeleccionado ? 'activo' : ''}" onclick="seleccionarChat('private', ${u.id}, '${escaparHTML(u.nombre)}')">
                             <span class="user-avatar">${u.avatar || '👤'}</span> 
                             <div class="user-info">
-                                <b>${escaparHTML(u.nombre)}</b> 
+                                <b style="${estiloNombre}">${escaparHTML(u.nombre)}</b> 
                                 ${parseInt(u.baneado) === 1 ? '<small style="color:#dc3545; font-size:10px; display:block;">(Baneado)</small>' : ''}
+                                ${tieneNoLeidos ? '<small style="color:#007bff; font-size:10px; display:block;">● Nuevo mensaje</small>' : ''}
                             </div>
                             ${adminBtns}
                         </div>`;
