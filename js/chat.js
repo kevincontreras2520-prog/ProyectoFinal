@@ -17,46 +17,49 @@ function cargarUsuarios() {
 
             let html = `
                 <div class="item-usuario-chat ${chatActivo.tipo === 'group' ? 'activo' : ''}" onclick="seleccionarChat('group', null, 'Sala General')">
-                    <span>💬</span> <b>Sala General</b>
+                    <span class="user-avatar">💬</span> 
+                    <div class="user-info"><b>Sala General</b></div>
                 </div>`;
 
             if (data.usuarios) {
                 data.usuarios.forEach(u => {
                     if (u.id == data.usuario_actual_id) return;
                     
-                    let // Reemplaza la línea original de adminBtns por esta:
-adminBtns = `
-    <button onclick="event.stopPropagation(); banearUsuario(${u.id}, ${esBaneado ? 0 : 1})" class="btn btn-primary btn-sm" style="padding: 2px 6px; font-size: 10px;">${esBaneado ? 'Activar' : 'Banear'}</button>
-    <button onclick="event.stopPropagation(); eliminarUsuario(${u.id})" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px; margin-left: 3px;">🗑️</button>
-`;
+                    let adminBtns = '';
+                    if (data.es_admin && u.rol !== 'admin') {
+                        const esBaneado = parseInt(u.baneado) === 1;
+                        adminBtns = `
+                            <div class="user-actions">
+                                <button onclick="event.stopPropagation(); banearUsuario(${u.id}, ${esBaneado ? 0 : 1})" class="btn btn-primary btn-sm" style="padding: 2px 6px; font-size: 10px;">${esBaneado ? 'Activar' : 'Banear'}</button>
+                                <button onclick="event.stopPropagation(); eliminarUsuario(${u.id})" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px; margin-left: 3px;">🗑️</button>
+                            </div>`;
+                    }
 
                     const esSeleccionado = chatActivo.tipo === 'private' && chatActivo.destinatarioId == u.id;
 
                     html += `
                         <div class="item-usuario-chat ${esSeleccionado ? 'activo' : ''}" onclick="seleccionarChat('private', ${u.id}, '${u.nombre}')">
-                            <span>${u.avatar || '👤'}</span> 
-                            <div style="flex:1;"><b>${u.nombre}</b> ${parseInt(u.baneado) === 1 ? '<small style="color:red;">(Baneado)</small>' : ''}</div>
+                            <span class="user-avatar">${u.avatar || '👤'}</span> 
+                            <div class="user-info">
+                                <b>${u.nombre}</b> 
+                                ${parseInt(u.baneado) === 1 ? '<small style="color:#dc3545; font-size:10px; display:block;">(Baneado)</small>' : ''}
+                            </div>
                             ${adminBtns}
                         </div>`;
                 });
             }
             caja.innerHTML = html;
-        });
+        })
+        .catch(err => console.error("Error cargando usuarios:", err));
 }
 
 function seleccionarChat(tipo, id, nombre) {
     chatActivo = { tipo: tipo, destinatarioId: id, nombre: nombre };
-    
     const titulo = document.getElementById('chat-titulo');
-    if (titulo) {
-        titulo.innerText = tipo === 'group' ? '💬 Sala General' : `🔒 Chat Privado con ${nombre}`;
-    }
-
+    if (titulo) titulo.innerText = tipo === 'group' ? '💬 Sala General' : `🔒 Chat Privado con ${nombre}`;
     const caja = document.getElementById('chat-box');
-    if (caja) {
-        caja.innerHTML = '<small style="color:gray;">Cargando conversación...</small>';
-    }
-
+    if (caja) caja.innerHTML = '<small style="color:gray;">Cargando conversación...</small>';
+    
     cargarUsuarios();
     cargarMensajes();
 }
@@ -97,21 +100,21 @@ function cargarMensajes() {
                     let adminAcciones = '';
                     if (data.es_admin) {
                         if (chatActivo.tipo === 'group') {
-                            adminAcciones += `<button onclick="fijarMensaje(${msg.id})" class="btn btn-primary btn-sm">📌</button>`;
+                            adminAcciones += `<button onclick="fijarMensaje(${msg.id})" class="btn btn-primary btn-sm" style="padding: 2px 6px; font-size: 10px;">📌</button>`;
                         }
-                        adminAcciones += `<button onclick="borrarMensaje(${msg.id})" class="btn btn-danger btn-sm">🗑️</button>`;
+                        adminAcciones += `<button onclick="borrarMensaje(${msg.id})" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px; margin-left: 3px;">🗑️</button>`;
                     }
 
                     caja.innerHTML += `
-    <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
-        <small><b>${msg.avatar || '👤'} ${msg.nombre}</b></small>
-        <div>${msg.mensaje}</div>
-        ${adminAcciones ? `<div style="margin-top: 5px; text-align: right;">${adminAcciones}</div>` : ''}
-    </div>`;
+                        <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
+                            <small><b>${msg.avatar || '👤'} ${msg.nombre}</b></small>
+                            <div>${msg.mensaje}</div>
+                            ${adminAcciones ? `<div style="margin-top: 5px; text-align: right;">${adminAcciones}</div>` : ''}
+                        </div>`;
                 });
                 caja.scrollTop = caja.scrollHeight;
             } else {
-                caja.innerHTML = '<small style="color:gray;">No hay mensajes en esta conversación privada. ¡Escribe el primero!</small>';
+                caja.innerHTML = '<small style="color:gray;">No hay mensajes en esta conversación. ¡Escribe el primero!</small>';
             }
         })
         .catch(err => {
@@ -176,9 +179,9 @@ function banearUsuario(id, estado) {
         body: JSON.stringify({ sub_accion: 'toggle_ban', usuario_id: id, baneado: estado })
     }).then(() => cargarUsuarios());
 }
+
 function eliminarUsuario(id) {
     if (!confirm("¿Estás seguro de eliminar esta cuenta? Se borrarán todos sus mensajes, posts y comentarios.")) return;
-    
     fetch('api/index.php?modulo=chat&accion=admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
