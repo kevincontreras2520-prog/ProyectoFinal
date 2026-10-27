@@ -63,7 +63,7 @@ function cargarHilos() {
                             </div>
 
                             <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${escaparHTML(hilo.contenido)}</p>
-                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${escaparHTML(hilo.nombre || hilo.autor)}</b> el ${hilo.fecha_creacion}</small>
+                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${escaparHTML(hilo.nombre || hilo.autor)}</b> el ${tiempoHumano(hilo.fecha_creacion)}</small>
                         </div>`;
                 });
             } else {
@@ -149,7 +149,7 @@ function cargarRespuestas(tema_id) {
                         <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee; position: relative;">
                             <div style="margin-bottom: 5px; padding-right: 30px;">
                                 <b>${resp.avatar || '👤'} ${escaparHTML(resp.nombre)}</b> 
-                                <small style="color:#888; margin-left: 10px;">${resp.fecha_creacion}</small>
+                                <small style="color:#888; margin-left: 10px;">${tiempoHumano(hilo.fecha_creacion)}</small>
                                 ${btnBorrarResp}
                             </div>
                             <div style="color:#333;">${escaparHTML(resp.contenido)}</div>
