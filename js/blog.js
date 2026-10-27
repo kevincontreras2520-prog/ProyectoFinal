@@ -11,31 +11,42 @@ function cargarPosts() {
             const posts = response.posts || response;
             if (!Array.isArray(posts)) return;
 
-            const strPosts = JSON.stringify(posts);
-            if (strPosts === cachePosts) {
-                posts.forEach(p => cargarComentarios(p.id));
-                return;
-            }
-
-            cachePosts = strPosts;
             const caja = document.getElementById('blog-box');
             if (!caja) return;
             caja.innerHTML = '';
 
+            if (posts.length === 0) {
+                caja.innerHTML = '<p style="text-align:center; color:gray;">No hay publicaciones aún. ¡Sé el primero en escribir!</p>';
+                return;
+            }
+
             posts.forEach(post => {
+                // Convertimos los saltos de línea en <br> para que se lean bien los párrafos
+                const contenidoFormateado = post.contenido.replace(/\n/g, '<br>');
+
                 caja.innerHTML += `
-                    <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
-                        <h2 style="margin:0;">${post.titulo}</h2>
-                        <p>${post.contenido}</p>
-                        <small style="color:gray;">Por <b>${post.avatar || '👤'} ${post.nombre || post.autor}</b> | ${post.fecha_creacion}</small>
-                        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+                    <div class="tarjeta-post">
+                        <div class="post-header">
+                            <div class="post-avatar">${post.avatar || '👤'}</div>
+                            <div class="post-info">
+                                <b>${post.nombre || post.autor}</b>
+                                <small>${post.fecha_creacion}</small>
+                            </div>
+                        </div>
                         
-                        <div id="comentarios-post-${post.id}"><i>Cargando comentarios...</i></div>
+                        <div class="post-body">
+                            <h3 class="post-titulo">${post.titulo}</h3>
+                            <p class="post-contenido">${contenidoFormateado}</p>
+                        </div>
                         
-                        <div style="margin-top:10px; display:flex; gap:5px;">
-                            <input type="text" id="texto-comentario-${post.id}" placeholder="Escribe un comentario..." style="margin:0;">
-                            <input type="hidden" id="padre-comentario-${post.id}" value="">
-                            <button onclick="enviarComentario(${post.id})" class="btn btn-primary">Comentar</button>
+                        <div class="post-comentarios">
+                            <div id="comentarios-post-${post.id}"><i style="color:gray; font-size:13px;">Cargando comentarios...</i></div>
+                            
+                            <div class="input-comentario">
+                                <input type="text" id="texto-comentario-${post.id}" placeholder="Escribe un comentario..." maxlength="500">
+                                <input type="hidden" id="padre-comentario-${post.id}" value="">
+                                <button onclick="enviarComentario(${post.id})" class="btn btn-primary">Comentar</button>
+                            </div>
                         </div>
                     </div>`;
                 cargarComentarios(post.id);
