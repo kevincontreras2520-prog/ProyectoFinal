@@ -1,6 +1,13 @@
 let cachePosts = '';
 let cacheComentarios = {};
 
+// Función para evitar inyección de código (XSS)
+function escaparHTML(str) {
+    return String(str || '').replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+}
+
 function cargarPosts() {
     const cursor = document.activeElement;
     if (cursor && cursor.id && cursor.id.includes('comentario')) return;
@@ -21,20 +28,20 @@ function cargarPosts() {
             }
 
             posts.forEach(post => {
-                const contenidoFormateado = post.contenido.replace(/\n/g, '<br>');
+                const contenidoFormateado = escaparHTML(post.contenido).replace(/\n/g, '<br>');
 
                 caja.innerHTML += `
                     <div class="tarjeta-post">
                         <div class="post-header">
                             <div class="post-avatar">${post.avatar || '👤'}</div>
                             <div class="post-info">
-                                <b>${post.nombre || post.autor}</b>
+                                <b>${escaparHTML(post.nombre || post.autor)}</b>
                                 <small>${post.fecha_creacion}</small>
                             </div>
                         </div>
                         
                         <div class="post-body">
-                            <h3 class="post-titulo">${post.titulo} 
+                            <h3 class="post-titulo">${escaparHTML(post.titulo)} 
                                 <button onclick="borrarPost(${post.id})" class="btn btn-danger btn-sm" style="float: right;">🗑️ Borrar Post</button>
                             </h3>
                             <p class="post-contenido">${contenidoFormateado}</p>
@@ -72,7 +79,7 @@ function cargarComentarios(postId) {
             comentarios.forEach(com => {
                 caja.innerHTML += `
                     <div class="comentario-padre">
-                        <b>${com.avatar || '👤'} ${com.nombre}:</b> ${com.contenido}
+                        <b>${com.avatar || '👤'} ${escaparHTML(com.nombre)}:</b> ${escaparHTML(com.contenido)}
                         <button onclick="borrarComentario(${com.id}, ${postId})" class="btn btn-danger btn-sm" style="float: right; padding: 0 5px; font-size: 10px; line-height: 1.5;">x</button>
                     </div>`;
             });
@@ -88,7 +95,7 @@ function prepararRespuesta(postId, padreId, autor) {
 
 function enviarComentario(postId) {
     const inputElement = document.getElementById(`texto-comentario-${postId}`);
-    const contenido = inputElement.value.trim(); // TRIM para evitar comentarios vacíos
+    const contenido = inputElement.value.trim();
     const padreId = document.getElementById(`padre-comentario-${postId}`).value;
 
     if (!contenido) {
@@ -96,8 +103,7 @@ function enviarComentario(postId) {
         return;
     }
 
-    // Desactivar el botón temporalmente para evitar doble clic
-    const btn = inputElement.nextElementSibling; // El botón que está al lado
+    const btn = inputElement.nextElementSibling;
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
@@ -122,7 +128,6 @@ function enviarComentario(postId) {
         alert("Error de conexión con el servidor.");
     })
     .finally(() => {
-        // Volver a activar el botón
         btn.disabled = false;
         btn.innerText = "Comentar";
     });
@@ -154,10 +159,6 @@ function crearPost() {
         }
     });
 }
-
-// ==========================================
-// FUNCIONES NUEVAS PARA ELIMINAR (ADMIN)
-// ==========================================
 
 function borrarPost(id) {
     if (!confirm("¿Eliminar esta publicación permanentemente?")) return;
