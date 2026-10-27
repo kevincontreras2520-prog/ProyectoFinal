@@ -21,7 +21,6 @@ function cargarPosts() {
             }
 
             posts.forEach(post => {
-                // Convertimos los saltos de línea en <br> para que se lean bien los párrafos
                 const contenidoFormateado = post.contenido.replace(/\n/g, '<br>');
 
                 caja.innerHTML += `
@@ -35,7 +34,6 @@ function cargarPosts() {
                         </div>
                         
                         <div class="post-body">
-                            <!-- Título corregido y botón de borrar post -->
                             <h3 class="post-titulo">${post.titulo} 
                                 <button onclick="borrarPost(${post.id})" class="btn btn-danger btn-sm" style="float: right;">🗑️ Borrar Post</button>
                             </h3>
@@ -46,7 +44,7 @@ function cargarPosts() {
                             <div id="comentarios-post-${post.id}"><i style="color:gray; font-size:13px;">Cargando comentarios...</i></div>
                             
                             <div class="input-comentario">
-                                <input type="text" id="texto-comentario-${post.id}" placeholder="Escribe un comentario..." maxlength="500">
+                                <input type="text" id="texto-comentario-${post.id}" placeholder="Escribe un comentario..." maxlength="500" onkeypress="if(event.key === 'Enter') enviarComentario(${post.id})">
                                 <input type="hidden" id="padre-comentario-${post.id}" value="">
                                 <button onclick="enviarComentario(${post.id})" class="btn btn-primary">Comentar</button>
                             </div>
@@ -66,8 +64,12 @@ function cargarComentarios(postId) {
             if (!caja) return;
             caja.innerHTML = '';
 
+            if (comentarios.length === 0) {
+                caja.innerHTML = '<i style="color:gray; font-size:13px;">Sin comentarios aún.</i>';
+                return;
+            }
+
             comentarios.forEach(com => {
-                // Botón para borrar comentario principal
                 caja.innerHTML += `
                     <div class="comentario-padre">
                         <b>${com.avatar || '👤'} ${com.nombre}:</b> ${com.contenido}
@@ -85,8 +87,19 @@ function prepararRespuesta(postId, padreId, autor) {
 }
 
 function enviarComentario(postId) {
-    const contenido = document.getElementById(`texto-comentario-${postId}`).value;
+    const inputElement = document.getElementById(`texto-comentario-${postId}`);
+    const contenido = inputElement.value.trim(); // TRIM para evitar comentarios vacíos
     const padreId = document.getElementById(`padre-comentario-${postId}`).value;
+
+    if (!contenido) {
+        alert("El comentario no puede estar vacío.");
+        return;
+    }
+
+    // Desactivar el botón temporalmente para evitar doble clic
+    const btn = inputElement.nextElementSibling; // El botón que está al lado
+    btn.disabled = true;
+    btn.innerText = "Enviando...";
 
     fetch('api/index.php?modulo=blog&accion=crear_comentario', {
         method: 'POST',
@@ -97,16 +110,32 @@ function enviarComentario(postId) {
     .then(res => res.json())
     .then(data => {
         if (!data.error) {
-            document.getElementById(`texto-comentario-${postId}`).value = '';
+            inputElement.value = '';
             document.getElementById(`padre-comentario-${postId}`).value = '';
             cargarComentarios(postId);
+        } else {
+            alert("Error al enviar comentario: " + (data.mensaje || "Revisa tu conexión."));
         }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error de conexión con el servidor.");
+    })
+    .finally(() => {
+        // Volver a activar el botón
+        btn.disabled = false;
+        btn.innerText = "Comentar";
     });
 }
 
 function crearPost() {
     const titulo = document.getElementById('blog-titulo').value;
     const contenido = document.getElementById('blog-contenido').value;
+
+    if (!titulo || !contenido) {
+        alert("Por favor, llena el título y el contenido.");
+        return;
+    }
 
     fetch('api/index.php?modulo=blog&accion=crear', {
         method: 'POST',
@@ -116,11 +145,12 @@ function crearPost() {
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.mensaje || "Post publicado exitosamente.");
         if (!data.error) {
             document.getElementById('blog-titulo').value = '';
             document.getElementById('blog-contenido').value = '';
             cargarPosts();
+        } else {
+            alert(data.mensaje || "Error al publicar.");
         }
     });
 }
@@ -143,7 +173,7 @@ function borrarPost(id) {
         if (!data.error) {
             cargarPosts(); 
         } else {
-            alert(data.mensaje); // Si no es admin, le saltará alerta de "No autorizado"
+            alert(data.mensaje);
         }
     });
 }
