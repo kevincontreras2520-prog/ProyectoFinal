@@ -86,10 +86,13 @@ function seleccionarChat(tipo, id, nombre) {
     chatActivo = { tipo: tipo, destinatarioId: id, nombre: nombre };
     const titulo = document.getElementById('chat-titulo');
     if (titulo) titulo.innerText = tipo === 'group' ? '💬 Sala General' : `🔒 Chat Privado con ${nombre}`;
+    
     const caja = document.getElementById('chat-box');
     if (caja) caja.innerHTML = '<small style="color:gray;">Cargando conversación...</small>';
     
-    cargarUsuarios();
+    // Forzamos la actualización de la lista de usuarios para quitar la negrita
+    cargarUsuarios(); 
+    
     cargarMensajes();
 }
 
