@@ -6,7 +6,6 @@ $accion = $_GET['accion'] ?? '';
 
 switch ($accion) {
     case 'leer':
-        // Verificar si el usuario actual es admin
         $stmtUser = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :id");
         $stmtUser->execute([':id' => $usuario_id]);
         $currentUser = $stmtUser->fetch();
@@ -19,7 +18,7 @@ switch ($accion) {
         echo json_encode([
             'error' => false, 
             'hilos' => $stmt->fetchAll(),
-            'es_admin' => $es_admin // Enviamos si es admin al frontend
+            'es_admin' => $es_admin 
         ]);
         break;
 
@@ -28,10 +27,16 @@ switch ($accion) {
         if (!empty($data['titulo']) && !empty($data['contenido'])) {
             // Validar longitud
             if (strlen($data['titulo']) > 255 || strlen($data['contenido']) > 5000) {
-            echo json_encode(['error' => true, 'mensaje' => 'El texto es demasiado largo.']);
-            break;
+                echo json_encode(['error' => true, 'mensaje' => 'El texto es demasiado largo.']);
+                break;
+            }
+            // Insertar correctamente
+            $stmt = $pdo->prepare("INSERT INTO temas (usuario_id, titulo, contenido) VALUES (:u, :t, :c)");
+            $stmt->execute([':u' => $usuario_id, ':t' => $data['titulo'], ':c' => $data['contenido']]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'Campos vacíos']);
         }
-        $stmt = $pdo->prepare("INSERT INTO publicaciones ...");
         break;
 
     case 'borrar':
@@ -42,22 +47,16 @@ switch ($accion) {
         
         if ($user['rol'] === 'admin') {
             $hilo_id = intval($data['hilo_id']);
-
-            // 1. Borrar las respuestas del tema primero
             $delRespuestas = $pdo->prepare("DELETE FROM comentarios WHERE tema_id = :id AND modulo = 'foro'");
             $delRespuestas->execute([':id' => $hilo_id]);
-
-            // 2. Borrar el tema
             $del = $pdo->prepare("DELETE FROM temas WHERE id = :id");
             $del->execute([':id' => $hilo_id]);
-            
             echo json_encode(['error' => false]);
         } else {
             echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
         }
         break;
 
-    // Leer las respuestas de un tema
     case 'leer_respuestas':
         $tema_id = intval($_GET['tema_id'] ?? 0);
         $stmt = $pdo->prepare("SELECT c.id, c.comentario AS contenido, c.creado_en AS fecha_creacion, u.nombre, u.avatar
@@ -67,7 +66,6 @@ switch ($accion) {
         echo json_encode(['error' => false, 'respuestas' => $stmt->fetchAll()]);
         break;
 
-    // Crear una respuesta
     case 'crear_respuesta':
         $data = json_decode(file_get_contents("php://input"), true);
         $tema_id = intval($data['tema_id'] ?? 0);
@@ -82,7 +80,6 @@ switch ($accion) {
         }
         break;
 
-    // NUEVO: Borrar una respuesta individual
     case 'borrar_respuesta':
         $data = json_decode(file_get_contents("php://input"), true);
         $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
