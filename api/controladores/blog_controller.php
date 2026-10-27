@@ -23,13 +23,11 @@ switch ($accion) {
         break;
 
     case 'leer_comentarios':
-        // Adaptado a tu tabla: tema_id y comentario
         $post_id = intval($_GET['post_id'] ?? 0);
-        $stmt = $pdo->prepare("SELECT c.id, c.comentario AS contenido, c.tema_id AS comentario_padre_id, c.creado_en AS fecha_creacion, u.nombre, u.avatar
+        // Buscamos usando 'tema_id' y 'comentario'
+        $stmt = $pdo->prepare("SELECT c.id, c.comentario AS contenido, c.creado_en AS fecha_creacion, u.nombre, u.avatar
                                FROM comentarios c JOIN usuarios u ON c.usuario_id = u.id
-                               WHERE c.id = :p OR c.tema_id = :p ORDER BY c.id ASC");
-        // Nota: Como no tienes una columna clara para "comentario_padre", 
-        // asumiremos que 'tema_id' guarda el ID del post principal al que pertenece el comentario.
+                               WHERE c.tema_id = :p ORDER BY c.id ASC");
         $stmt->execute([':p' => $post_id]);
         echo json_encode(['error' => false, 'comentarios' => $stmt->fetchAll()]);
         break;
@@ -40,7 +38,7 @@ switch ($accion) {
         $contenido = trim($data['contenido'] ?? '');
         
         if ($post_id && $contenido) {
-            // Insertamos usando 'tema_id' y 'comentario' según tu BD
+            // Insertamos usando 'tema_id' y 'comentario'
             $stmt = $pdo->prepare("INSERT INTO comentarios (tema_id, usuario_id, comentario) VALUES (:p, :u, :c)");
             $stmt->execute([':p' => $post_id, ':u' => $usuario_id, ':c' => $contenido]);
             echo json_encode(['error' => false]);
@@ -48,7 +46,8 @@ switch ($accion) {
             echo json_encode(['error' => true, 'mensaje' => 'Datos incompletos']);
         }
         break;
-        case 'borrar_post':
+    
+    case 'borrar_post':
         $data = json_decode(file_get_contents("php://input"), true);
         $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
         $stmt->execute([':u' => $usuario_id]);
@@ -65,6 +64,7 @@ switch ($accion) {
 
     case 'borrar_comentario':
         $data = json_decode(file_get_contents("php://input"), true);
+        // Verificamos que sea admin
         $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
         $stmt->execute([':u' => $usuario_id]);
         $user = $stmt->fetch();
