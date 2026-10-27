@@ -171,6 +171,12 @@ body {
     display: block;
     margin-bottom: 3px;
     color: #555;
+    font-size: 12px;
+}
+
+.mensaje-burbuja div:last-child small {
+    font-size: 10px;
+    color: #888;
 }
 
 .banner-fijado { 
