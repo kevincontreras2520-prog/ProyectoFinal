@@ -4,6 +4,15 @@ if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
+// Verificar si está baneado
+$stmtBan = $pdo->prepare("SELECT baneado FROM usuarios WHERE id = :id");
+$stmtBan->execute([':id' => $_SESSION['usuario_id']]);
+$userBan = $stmtBan->fetch();
+if ($userBan && $userBan['baneado'] == 1) {
+    session_destroy();
+    header("Location: login.php?baneado=1");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
