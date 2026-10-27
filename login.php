@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Iniciar Sesión - Proyecto Web</title>
     <link rel="stylesheet" href="css/css.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body class="body-center">
     <div class="panel-auth">
