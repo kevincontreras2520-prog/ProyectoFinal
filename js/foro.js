@@ -1,4 +1,5 @@
 let temaActualId = null;
+let esAdminGlobal = false; // Variable global para saber si es admin
 
 // Función para evitar inyección de código (XSS)
 function escaparHTML(str) {
@@ -20,10 +21,16 @@ function cargarHilos() {
             const caja = document.getElementById('foro-box');
             if (!caja) return;
 
+            // Guardamos si el usuario actual es admin
+            esAdminGlobal = data.es_admin || false;
+
             caja.innerHTML = '';
             
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
+                    // Lógica del botón de borrar tema
+                    const btnBorrarHilo = esAdminGlobal ? `<button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>` : '';
+
                     caja.innerHTML += `
                         <div class="tarjeta-post" style="padding: 15px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
                             
@@ -32,7 +39,7 @@ function cargarHilos() {
                                 
                                 <div style="display: flex; gap: 8px; flex-shrink: 0;">
                                     <button onclick="abrirTema(${hilo.id}, this.parentElement.parentElement.querySelector('h3').innerText)" class="btn btn-primary btn-sm">💬 Ver Hilo</button>
-                                    <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>
+                                    ${btnBorrarHilo}
                                 </div>
                             </div>
 
@@ -116,13 +123,15 @@ function cargarRespuestas(tema_id) {
             caja.innerHTML = '';
             if (data.respuestas && data.respuestas.length > 0) {
                 data.respuestas.forEach(resp => {
+                    // Lógica del botón de borrar respuesta
+                    const btnBorrarResp = esAdminGlobal ? `<button onclick="borrarRespuesta(${resp.id})" class="btn btn-danger btn-sm" style="position: absolute; right: 10px; top: 10px; padding: 0 5px; font-size: 10px;">x</button>` : '';
+
                     caja.innerHTML += `
                         <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee; position: relative;">
                             <div style="margin-bottom: 5px; padding-right: 30px;">
                                 <b>${resp.avatar || '👤'} ${escaparHTML(resp.nombre)}</b> 
                                 <small style="color:#888; margin-left: 10px;">${resp.fecha_creacion}</small>
-                                <!-- Botón para borrar respuesta -->
-                                <button onclick="borrarRespuesta(${resp.id})" class="btn btn-danger btn-sm" style="position: absolute; right: 10px; top: 10px; padding: 0 5px; font-size: 10px;">x</button>
+                                ${btnBorrarResp}
                             </div>
                             <div style="color:#333;">${escaparHTML(resp.contenido)}</div>
                         </div>`;
@@ -157,7 +166,6 @@ function enviarRespuesta() {
     });
 }
 
-// NUEVO: Función para borrar una respuesta individual
 function borrarRespuesta(id) {
     if (!confirm("¿Eliminar esta respuesta del foro?")) return;
     
