@@ -6,7 +6,6 @@ $accion = $_GET['accion'] ?? '';
 
 switch ($accion) {
     case 'leer':
-        // Cambiamos 'hilos' por 'temas' y 'fecha_creacion' por 'creado_en'
         $stmt = $pdo->query("SELECT t.id, t.titulo, t.contenido, t.creado_en AS fecha_creacion, u.nombre, u.avatar 
                              FROM temas t JOIN usuarios u ON t.usuario_id = u.id 
                              ORDER BY t.creado_en DESC");
@@ -16,7 +15,6 @@ switch ($accion) {
     case 'crear':
         $data = json_decode(file_get_contents("php://input"), true);
         if (!empty($data['titulo']) && !empty($data['contenido'])) {
-            // Insertamos en la tabla 'temas'
             $stmt = $pdo->prepare("INSERT INTO temas (usuario_id, titulo, contenido) VALUES (:u, :t, :c)");
             $stmt->execute([':u' => $usuario_id, ':t' => $data['titulo'], ':c' => $data['contenido']]);
             echo json_encode(['error' => false]);
@@ -24,7 +22,8 @@ switch ($accion) {
             echo json_encode(['error' => true, 'mensaje' => 'Campos vacíos']);
         }
         break;
-        case 'borrar':
+
+    case 'borrar':
         $data = json_decode(file_get_contents("php://input"), true);
         $stmt = $pdo->prepare("SELECT rol FROM usuarios WHERE id = :u");
         $stmt->execute([':u' => $usuario_id]);
@@ -36,6 +35,31 @@ switch ($accion) {
             echo json_encode(['error' => false]);
         } else {
             echo json_encode(['error' => true, 'mensaje' => 'No autorizado']);
+        }
+        break;
+
+    // NUEVO: Leer las respuestas de un tema
+    case 'leer_respuestas':
+        $tema_id = intval($_GET['tema_id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT c.id, c.comentario AS contenido, c.creado_en AS fecha_creacion, u.nombre, u.avatar
+                               FROM comentarios c JOIN usuarios u ON c.usuario_id = u.id
+                               WHERE c.tema_id = :t AND c.modulo = 'foro' ORDER BY c.creado_en ASC");
+        $stmt->execute([':t' => $tema_id]);
+        echo json_encode(['error' => false, 'respuestas' => $stmt->fetchAll()]);
+        break;
+
+    // NUEVO: Crear una respuesta
+    case 'crear_respuesta':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $tema_id = intval($data['tema_id'] ?? 0);
+        $contenido = trim($data['contenido'] ?? '');
+        
+        if ($tema_id && $contenido) {
+            $stmt = $pdo->prepare("INSERT INTO comentarios (tema_id, usuario_id, comentario, modulo) VALUES (:t, :u, :c, 'foro')");
+            $stmt->execute([':t' => $tema_id, ':u' => $usuario_id, ':c' => $contenido]);
+            echo json_encode(['error' => false]);
+        } else {
+            echo json_encode(['error' => true, 'mensaje' => 'El mensaje no puede estar vacío']);
         }
         break;
 }
