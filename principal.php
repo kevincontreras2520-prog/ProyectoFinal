@@ -11,6 +11,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <meta charset="UTF-8">
     <title>Menú Principal</title>
     <link rel="stylesheet" href="css/css.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
     <div class="header-bar">
