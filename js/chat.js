@@ -103,10 +103,11 @@ function cargarMensajes() {
                     }
 
                     caja.innerHTML += `
-                        <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
-                            <small><b>${msg.avatar || '👤'} ${msg.nombre}</b></small>: ${msg.mensaje}
-                            <div style="text-align:right; margin-top:3px;">${adminAcciones}</div>
-                        </div>`;
+    <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
+        <small><b>${msg.avatar || '👤'} ${msg.nombre}</b></small>
+        <div>${msg.mensaje}</div>
+        ${adminAcciones ? `<div style="margin-top: 5px; text-align: right;">${adminAcciones}</div>` : ''}
+    </div>`;
                 });
                 caja.scrollTop = caja.scrollHeight;
             } else {
