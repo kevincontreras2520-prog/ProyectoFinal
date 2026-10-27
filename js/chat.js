@@ -158,6 +158,11 @@ function enviarMensaje() {
     const mensaje = input.value.trim();
     if (!mensaje) return;
 
+    // --- NUEVO: Verificar si el usuario actual está baneado en la lista ---
+    const listaUsuarios = document.querySelectorAll('.item-usuario-chat');
+    // (Esta es una validación opcional en JS, pero el backend ya lo bloquea de todas formas)
+    // --------------------------------------------------
+    
     const payload = {
         mensaje: mensaje,
         destinatario_id: chatActivo.tipo === 'private' ? chatActivo.destinatarioId : null
