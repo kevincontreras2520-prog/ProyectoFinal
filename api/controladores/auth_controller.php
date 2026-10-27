@@ -80,6 +80,45 @@ switch ($accion) {
         echo json_encode(['autenticado' => true, 'usuario' => $user]);
         break;
 
+    case 'actualizar_perfil':
+        $usuario_id = $_SESSION['usuario_id'] ?? null;
+        if (!$usuario_id) {
+            echo json_encode(['error' => true, 'mensaje' => 'No autenticado']);
+            exit;
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $avatar = $data['avatar'] ?? '😀';
+        $passActual = $data['pass_actual'] ?? '';
+        $passNueva = $data['pass_nueva'] ?? '';
+
+        try {
+            // 1. Actualizar Avatar
+            $stmt = $pdo->prepare("UPDATE usuarios SET avatar = :a WHERE id = :id");
+            $stmt->execute([':a' => $avatar, ':id' => $usuario_id]);
+
+            // 2. Si escribió una contraseña nueva, verificarla y cambiarla
+            if (!empty($passNueva)) {
+                $stmtUser = $pdo->prepare("SELECT password FROM usuarios WHERE id = :id");
+                $stmtUser->execute([':id' => $usuario_id]);
+                $user = $stmtUser->fetch();
+
+                if (password_verify($passActual, $user['password'])) {
+                    $nuevoHash = password_hash($passNueva, PASSWORD_DEFAULT);
+                    $stmtPass = $pdo->prepare("UPDATE usuarios SET password = :p WHERE id = :id");
+                    $stmtPass->execute([':p' => $nuevoHash, ':id' => $usuario_id]);
+                } else {
+                    echo json_encode(['error' => true, 'mensaje' => 'La contraseña actual es incorrecta.']);
+                    exit;
+                }
+            }
+
+            echo json_encode(['error' => false, 'mensaje' => 'Perfil actualizado con éxito.']);
+        } catch (PDOException $e) {
+            echo json_encode(['error' => true, 'mensaje' => 'Error: ' . $e->getMessage()]);
+        }
+        break;
+
     default:
         echo json_encode(['error' => true, 'mensaje' => 'Acción no válida']);
         break;
