@@ -1,5 +1,12 @@
 let chatActivo = { tipo: 'group', destinatarioId: null, nombre: 'Sala General' };
 
+// Función para evitar inyección de código (XSS)
+function escaparHTML(str) {
+    return String(str || '').replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+}
+
 function inicializarChat() {
     cargarUsuarios();
     cargarMensajes();
@@ -38,10 +45,10 @@ function cargarUsuarios() {
                     const esSeleccionado = chatActivo.tipo === 'private' && chatActivo.destinatarioId == u.id;
 
                     html += `
-                        <div class="item-usuario-chat ${esSeleccionado ? 'activo' : ''}" onclick="seleccionarChat('private', ${u.id}, '${u.nombre}')">
+                        <div class="item-usuario-chat ${esSeleccionado ? 'activo' : ''}" onclick="seleccionarChat('private', ${u.id}, '${escaparHTML(u.nombre)}')">
                             <span class="user-avatar">${u.avatar || '👤'}</span> 
                             <div class="user-info">
-                                <b>${u.nombre}</b> 
+                                <b>${escaparHTML(u.nombre)}</b> 
                                 ${parseInt(u.baneado) === 1 ? '<small style="color:#dc3545; font-size:10px; display:block;">(Baneado)</small>' : ''}
                             </div>
                             ${adminBtns}
@@ -84,7 +91,7 @@ function cargarMensajes() {
             const banner = document.getElementById('banner-fijado');
             if (banner) {
                 if (data.fijado && chatActivo.tipo === 'group') {
-                    banner.innerHTML = `📌 <b>Mensaje Fijado (${data.fijado.nombre}):</b> ${data.fijado.mensaje}`;
+                    banner.innerHTML = `📌 <b>Mensaje Fijado (${escaparHTML(data.fijado.nombre)}):</b> ${escaparHTML(data.fijado.mensaje)}`;
                     banner.style.display = 'block';
                 } else {
                     banner.style.display = 'none';
@@ -107,8 +114,8 @@ function cargarMensajes() {
 
                     caja.innerHTML += `
                         <div class="mensaje-burbuja ${esMio ? 'propio' : ''}">
-                            <small><b>${msg.avatar || '👤'} ${msg.nombre}</b></small>
-                            <div>${msg.mensaje}</div>
+                            <small><b>${msg.avatar || '👤'} ${escaparHTML(msg.nombre)}</b></small>
+                            <div>${escaparHTML(msg.mensaje)}</div>
                             ${adminAcciones ? `<div style="margin-top: 5px; text-align: right;">${adminAcciones}</div>` : ''}
                         </div>`;
                 });
