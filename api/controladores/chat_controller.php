@@ -41,15 +41,14 @@ switch ($accion) {
             $tipoChat = $_GET['tipo'] ?? 'group';
             $destinatarioId = !empty($_GET['destinatario_id']) ? intval($_GET['destinatario_id']) : null;
 
-            // --- NUEVO: Marcar como leídos si es un chat privado ---
+            // Marcar como leídos si es un chat privado
             if ($tipoChat === 'private' && $destinatarioId) {
-                // Actualizamos los mensajes que el OTRO me envió a MÍ
                 $stmtUpdate = $pdo->prepare("UPDATE mensajes SET leido = 1 WHERE usuario_id = :otro AND destinatario_id = :yo AND leido = 0");
                 $stmtUpdate->execute([':otro' => $destinatarioId, ':yo' => $usuario_id]);
             }
-            // -------------------------------------------------------
 
             if ($tipoChat === 'private' && $destinatarioId) {
+                // Consulta para chat privado (incluye m.enviado_en)
                 $sql = "SELECT m.id, m.mensaje, m.enviado_en, m.usuario_id, u.nombre, u.avatar 
                         FROM mensajes m JOIN usuarios u ON m.usuario_id = u.id 
                         WHERE ((m.usuario_id = :yo1 AND m.destinatario_id = :otro1) 
@@ -63,6 +62,7 @@ switch ($accion) {
                     ':yo2' => $usuario_id
                 ]);
             } else {
+                // Consulta para sala general (incluye m.enviado_en)
                 $sql = "SELECT m.id, m.mensaje, m.fijado, m.enviado_en, m.usuario_id, u.nombre, u.avatar 
                         FROM mensajes m JOIN usuarios u ON m.usuario_id = u.id 
                         WHERE m.destinatario_id IS NULL 
