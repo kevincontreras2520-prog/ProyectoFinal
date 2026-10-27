@@ -47,36 +47,15 @@ function cargarComentarios(postId) {
     fetch(`api/index.php?modulo=blog&accion=leer_comentarios&post_id=${postId}`, { credentials: 'include' })
         .then(res => res.json())
         .then(response => {
-            const comentarios = response.comentarios || response;
-            if (!Array.isArray(comentarios)) return;
-
-            const strCom = JSON.stringify(comentarios);
-            if (cacheComentarios[postId] === strCom) return;
-
-            cacheComentarios[postId] = strCom;
+            const comentarios = response.comentarios || [];
             const caja = document.getElementById(`comentarios-post-${postId}`);
             if (!caja) return;
             caja.innerHTML = '';
 
-            const principales = comentarios.filter(c => !c.comentario_padre_id);
-            const respuestas = comentarios.filter(c => c.comentario_padre_id);
-
-            principales.forEach(padre => {
-                const misRespuestas = respuestas.filter(r => r.comentario_padre_id == padre.id);
-                
-                let htmlRespuestas = '';
-                misRespuestas.forEach(hijo => {
-                    htmlRespuestas += `
-                        <div class="comentario-hijo">
-                            <b>${hijo.avatar || '👤'} ${hijo.nombre || hijo.autor}:</b> ${hijo.contenido}
-                        </div>`;
-                });
-
+            comentarios.forEach(com => {
                 caja.innerHTML += `
                     <div class="comentario-padre">
-                        <b>${padre.avatar || '👤'} ${padre.nombre || padre.autor}:</b> ${padre.contenido}
-                        <a href="javascript:void(0)" style="font-size:11px; margin-left:10px;" onclick="prepararRespuesta(${postId}, ${padre.id}, '${padre.nombre || padre.autor}')">↩ Responder</a>
-                        <div class="contenedor-respuestas">${htmlRespuestas}</div>
+                        <b>${com.avatar || '👤'} ${com.nombre}:</b> ${com.contenido}
                     </div>`;
             });
         });
