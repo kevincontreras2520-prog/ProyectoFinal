@@ -6,16 +6,18 @@ $accion = $_GET['accion'] ?? '';
 
 switch ($accion) {
     case 'leer':
-        $stmt = $pdo->query("SELECT h.id, h.titulo, h.contenido, h.fecha_creacion, u.nombre, u.avatar 
-                             FROM hilos h JOIN usuarios u ON h.usuario_id = u.id 
-                             ORDER BY h.fecha_creacion DESC");
+        // Cambiamos 'hilos' por 'temas' y 'fecha_creacion' por 'creado_en'
+        $stmt = $pdo->query("SELECT t.id, t.titulo, t.contenido, t.creado_en AS fecha_creacion, u.nombre, u.avatar 
+                             FROM temas t JOIN usuarios u ON t.usuario_id = u.id 
+                             ORDER BY t.creado_en DESC");
         echo json_encode(['error' => false, 'hilos' => $stmt->fetchAll()]);
         break;
 
     case 'crear':
         $data = json_decode(file_get_contents("php://input"), true);
         if (!empty($data['titulo']) && !empty($data['contenido'])) {
-            $stmt = $pdo->prepare("INSERT INTO hilos (usuario_id, titulo, contenido) VALUES (:u, :t, :c)");
+            // Insertamos en la tabla 'temas'
+            $stmt = $pdo->prepare("INSERT INTO temas (usuario_id, titulo, contenido) VALUES (:u, :t, :c)");
             $stmt->execute([':u' => $usuario_id, ':t' => $data['titulo'], ':c' => $data['contenido']]);
             echo json_encode(['error' => false]);
         } else {
