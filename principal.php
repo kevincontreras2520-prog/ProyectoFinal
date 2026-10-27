@@ -32,7 +32,8 @@ if ($userBan && $userBan['baneado'] == 1) {
                 <small id="user-rol" class="rol-badge">USUARIO</small>
             </div>
         </div>
-        <button onclick="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
+        
+        <!-- Aquí solo van los botones a la derecha, sin el duplicado -->
         <div style="display: flex; gap: 10px;">
             <a href="perfil.php" class="btn btn-primary">👤 Mi Perfil</a>
             <button onclick="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
