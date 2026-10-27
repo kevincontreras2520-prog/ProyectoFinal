@@ -1,5 +1,6 @@
 let cachePosts = '';
 let cacheComentarios = {};
+let esAdminGlobal = false; // Variable global para saber si es admin
 
 // Función para evitar inyección de código (XSS)
 function escaparHTML(str) {
@@ -18,6 +19,9 @@ function cargarPosts() {
             const posts = response.posts || response;
             if (!Array.isArray(posts)) return;
 
+            // Guardamos si el usuario actual es admin
+            esAdminGlobal = response.es_admin || false;
+
             const caja = document.getElementById('blog-box');
             if (!caja) return;
             caja.innerHTML = '';
@@ -29,6 +33,9 @@ function cargarPosts() {
 
             posts.forEach(post => {
                 const contenidoFormateado = escaparHTML(post.contenido).replace(/\n/g, '<br>');
+                
+                // Lógica del botón de borrar post
+                const botonBorrarPost = esAdminGlobal ? `<button onclick="borrarPost(${post.id})" class="btn btn-danger btn-sm" style="float: right;">🗑️ Borrar Post</button>` : '';
 
                 caja.innerHTML += `
                     <div class="tarjeta-post">
@@ -42,7 +49,7 @@ function cargarPosts() {
                         
                         <div class="post-body">
                             <h3 class="post-titulo">${escaparHTML(post.titulo)} 
-                                <button onclick="borrarPost(${post.id})" class="btn btn-danger btn-sm" style="float: right;">🗑️ Borrar Post</button>
+                                ${botonBorrarPost}
                             </h3>
                             <p class="post-contenido">${contenidoFormateado}</p>
                         </div>
@@ -77,10 +84,13 @@ function cargarComentarios(postId) {
             }
 
             comentarios.forEach(com => {
+                // Lógica del botón de borrar comentario
+                const btnBorrarComentario = esAdminGlobal ? `<button onclick="borrarComentario(${com.id}, ${postId})" class="btn btn-danger btn-sm" style="float: right; padding: 0 5px; font-size: 10px; line-height: 1.5;">x</button>` : '';
+
                 caja.innerHTML += `
                     <div class="comentario-padre">
                         <b>${com.avatar || '👤'} ${escaparHTML(com.nombre)}:</b> ${escaparHTML(com.contenido)}
-                        <button onclick="borrarComentario(${com.id}, ${postId})" class="btn btn-danger btn-sm" style="float: right; padding: 0 5px; font-size: 10px; line-height: 1.5;">x</button>
+                        ${btnBorrarComentario}
                     </div>`;
             });
         });
