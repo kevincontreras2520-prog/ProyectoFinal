@@ -1,4 +1,10 @@
+let temaActualId = null;
+
 function cargarHilos() {
+    // Ocultar la vista de respuestas y mostrar la lista de temas
+    document.getElementById('vista-temas').style.display = 'block';
+    document.getElementById('vista-respuestas').style.display = 'none';
+
     fetch('api/index.php?modulo=foro&accion=leer', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
@@ -11,15 +17,12 @@ function cargarHilos() {
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
                     caja.innerHTML += `
-                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
-                            
-                            <!-- Usamos Flexbox para que el título y el botón se acomoden solos -->
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <h3 style="margin: 0; color: #1a1a1a;">${hilo.titulo}</h3>
-                                <button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm" style="flex-shrink: 0; margin-left: 15px;">🗑️ Borrar</button>
+                        <div style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'" onclick="abrirTema(${hilo.id}, '${hilo.titulo.replace(/'/g, "\\'")}')">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h3 style="margin: 0; color: #007bff;">${hilo.titulo}</h3>
+                                <button onclick="event.stopPropagation(); borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️ Borrar</button>
                             </div>
-                            
-                            <p style="margin-top: 0; margin-bottom: 10px; color: #444; line-height: 1.5;">${hilo.contenido}</p>
+                            <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${hilo.contenido}</p>
                             <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${hilo.nombre || hilo.autor}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
                 });
@@ -64,8 +67,77 @@ function borrarHilo(id) {
     })
     .then(res => res.json())
     .then(data => { 
+        if (!data.error) cargarHilos(); 
+        else alert(data.mensaje);
+    });
+}
+
+// ==========================================
+// NUEVAS FUNCIONES PARA LOS HILOS (RESPUESTAS)
+// ==========================================
+
+function abrirTema(id, titulo) {
+    temaActualId = id;
+    document.getElementById('vista-temas').style.display = 'none';
+    document.getElementById('vista-respuestas').style.display = 'block';
+    
+    document.getElementById('titulo-tema-actual').innerText = "Tema: " + titulo;
+    cargarRespuestas(id);
+}
+
+function volverATemas() {
+    temaActualId = null;
+    cargarHilos();
+}
+
+function cargarRespuestas(tema_id) {
+    const caja = document.getElementById('lista-respuestas');
+    caja.innerHTML = '<p style="color:gray;">Cargando respuestas...</p>';
+
+    fetch(`api/index.php?modulo=foro&accion=leer_respuestas&tema_id=${tema_id}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                caja.innerHTML = `<p style="color:red;">${data.mensaje}</p>`;
+                return;
+            }
+
+            caja.innerHTML = '';
+            if (data.respuestas && data.respuestas.length > 0) {
+                data.respuestas.forEach(resp => {
+                    caja.innerHTML += `
+                        <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee;">
+                            <div style="margin-bottom: 5px;">
+                                <b>${resp.avatar || '👤'} ${resp.nombre}</b> 
+                                <small style="color:#888; margin-left: 10px;">${resp.fecha_creacion}</small>
+                            </div>
+                            <div style="color:#333;">${resp.contenido}</div>
+                        </div>`;
+                });
+            } else {
+                caja.innerHTML = '<p style="color:gray;">No hay respuestas en este tema. ¡Sé el primero en responder!</p>';
+            }
+        });
+}
+
+function enviarRespuesta() {
+    if (!temaActualId) return;
+    const input = document.getElementById('nueva-respuesta');
+    const contenido = input.value.trim();
+
+    if (!contenido) return alert("Escribe una respuesta.");
+
+    fetch('api/index.php?modulo=foro&accion=crear_respuesta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ tema_id: temaActualId, contenido: contenido })
+    })
+    .then(res => res.json())
+    .then(data => {
         if (!data.error) {
-            cargarHilos(); 
+            input.value = '';
+            cargarRespuestas(temaActualId);
         } else {
             alert(data.mensaje);
         }
