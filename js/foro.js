@@ -1,22 +1,5 @@
 let temaActualId = null;
-let esAdminGlobal = false; // Variable global para saber si es admin
-
-function tiempoHumano(fechaStr) {
-    if (!fechaStr) return '';
-    // Convertimos la fecha de MySQL a un formato que JS entienda
-    const fecha = new Date(fechaStr.replace(' ', 'T')); 
-    const ahora = new Date();
-    const diffMs = ahora - fecha;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHoras = Math.floor(diffMins / 60);
-
-    if (diffMins < 1) return 'Hace un momento';
-    if (diffMins < 60) return `Hace ${diffMins} min`;
-    if (diffHoras < 24) return `Hace ${diffHoras} horas`;
-    
-    // Si pasó más de un día, mostramos la fecha normal
-    return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-}
+let esAdminGlobal = false;
 
 // Función para evitar inyección de código (XSS)
 function escaparHTML(str) {
@@ -38,17 +21,14 @@ function cargarHilos() {
             const caja = document.getElementById('foro-box');
             if (!caja) return;
 
-            // Ya lo tenías bien en tu último mensaje, pero asegúrate de que esté así:
             esAdminGlobal = data.es_admin || false;
-            const hilos = data.hilos || [];
-            
+            const hilos = data.hilos || []; // Aseguramos leer la propiedad correcta
+
             caja.innerHTML = '';
             
             if (hilos.length > 0) {
                 hilos.forEach(hilo => {
-                    // ... resto del código
-                    // Lógica del botón de borrar tema
-                    const btnBorrarHilo = esAdminGlobal ? `<button onclick="borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>` : '';
+                    const btnBorrarHilo = esAdminGlobal ? `<button onclick="event.stopPropagation(); borrarHilo(${hilo.id})" class="btn btn-danger btn-sm">🗑️</button>` : '';
 
                     caja.innerHTML += `
                         <div class="tarjeta-post" style="padding: 15px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
@@ -57,13 +37,13 @@ function cargarHilos() {
                                 <h3 style="margin: 0; color: #007bff; flex: 1;" onclick="abrirTema(${hilo.id}, this.innerText)">${escaparHTML(hilo.titulo)}</h3>
                                 
                                 <div style="display: flex; gap: 8px; flex-shrink: 0;">
-                                    <button onclick="abrirTema(${hilo.id}, this.parentElement.parentElement.querySelector('h3').innerText)" class="btn btn-primary btn-sm">💬 Ver Hilo</button>
+                                    <button onclick="event.stopPropagation(); abrirTema(${hilo.id}, this.parentElement.parentElement.querySelector('h3').innerText)" class="btn btn-primary btn-sm">💬 Ver Hilo</button>
                                     ${btnBorrarHilo}
                                 </div>
                             </div>
 
                             <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${escaparHTML(hilo.contenido)}</p>
-                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${escaparHTML(hilo.nombre || hilo.autor)}</b> el ${tiempoHumano(hilo.fecha_creacion)}</small>
+                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${escaparHTML(hilo.nombre || hilo.autor)}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
                 });
             } else {
@@ -134,22 +114,25 @@ function cargarRespuestas(tema_id) {
     fetch(`api/index.php?modulo=foro&accion=leer_respuestas&tema_id=${tema_id}`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
+            // Si el servidor devuelve un error, lo mostramos en pantalla
             if (data.error) {
                 caja.innerHTML = `<p style="color:red;">${data.mensaje}</p>`;
                 return;
             }
 
+            // Nos aseguramos de leer la propiedad 'respuestas' que envía el PHP
+            const respuestas = data.respuestas || [];
+
             caja.innerHTML = '';
-            if (data.respuestas && data.respuestas.length > 0) {
-                data.respuestas.forEach(resp => {
-                    // Lógica del botón de borrar respuesta
+            if (respuestas.length > 0) {
+                respuestas.forEach(resp => {
                     const btnBorrarResp = esAdminGlobal ? `<button onclick="borrarRespuesta(${resp.id})" class="btn btn-danger btn-sm" style="position: absolute; right: 10px; top: 10px; padding: 0 5px; font-size: 10px;">x</button>` : '';
 
                     caja.innerHTML += `
                         <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee; position: relative;">
                             <div style="margin-bottom: 5px; padding-right: 30px;">
                                 <b>${resp.avatar || '👤'} ${escaparHTML(resp.nombre)}</b> 
-                                <small style="color:#888; margin-left: 10px;">${tiempoHumano(hilo.fecha_creacion)}</small>
+                                <small style="color:#888; margin-left: 10px;">${resp.fecha_creacion}</small>
                                 ${btnBorrarResp}
                             </div>
                             <div style="color:#333;">${escaparHTML(resp.contenido)}</div>
@@ -158,6 +141,10 @@ function cargarRespuestas(tema_id) {
             } else {
                 caja.innerHTML = '<p style="color:gray;">No hay respuestas en este tema. ¡Sé el primero en responder!</p>';
             }
+        })
+        .catch(err => {
+            console.error(err);
+            caja.innerHTML = '<p style="color:red;">Error de conexión al cargar respuestas.</p>';
         });
 }
 
@@ -167,6 +154,9 @@ function enviarRespuesta() {
     const contenido = input.value.trim();
 
     if (!contenido) return alert("Escribe una respuesta.");
+
+    const btn = document.querySelector('#vista-respuestas button[onclick="enviarRespuesta()"]');
+    if(btn) { btn.disabled = true; btn.innerText = "Enviando..."; }
 
     fetch('api/index.php?modulo=foro&accion=crear_respuesta', {
         method: 'POST',
@@ -178,10 +168,18 @@ function enviarRespuesta() {
     .then(data => {
         if (!data.error) {
             input.value = '';
+            // Volvemos a cargar las respuestas para que aparezca la nueva
             cargarRespuestas(temaActualId);
         } else {
-            alert(data.mensaje);
+            alert(data.mensaje || "Error al enviar la respuesta.");
         }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error de conexión con el servidor.");
+    })
+    .finally(() => {
+        if(btn) { btn.disabled = false; btn.innerText = "Enviar Respuesta"; }
     });
 }
 
