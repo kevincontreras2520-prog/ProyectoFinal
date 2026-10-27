@@ -33,6 +33,10 @@ if ($userBan && $userBan['baneado'] == 1) {
             </div>
         </div>
         <button onclick="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
+        <div style="display: flex; gap: 10px;">
+            <a href="perfil.php" class="btn btn-primary">👤 Mi Perfil</a>
+            <button onclick="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
+        </div>
     </div>
 
     <div class="contenedor-dashboard">
