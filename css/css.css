@@ -63,7 +63,7 @@ body {
     gap: 20px; 
     max-width: 1100px; 
     margin: 0 auto; 
-    height: 80vh; /* Altura fija para todo el chat */
+    height: 80vh; 
 }
 
 .chat-sidebar { 
@@ -74,8 +74,8 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
     display: flex; 
     flex-direction: column; 
-    height: 100%; /* Obliga a que ocupe el 80vh completo */
-    overflow: hidden; /* Evita que los usuarios se salgan del cuadro blanco */
+    height: 100%; 
+    overflow: hidden; 
 }
 
 .chat-sidebar h3 {
@@ -86,12 +86,11 @@ body {
 }
 
 #lista-usuarios {
-    flex: 1; /* Toma todo el espacio disponible debajo del título */
-    overflow-y: auto; /* Agrega scroll interno SOLO a la lista de contactos */
+    flex: 1; 
+    overflow-y: auto; 
     padding-right: 5px;
 }
 
-/* Scroll estético para la lista de contactos */
 #lista-usuarios::-webkit-scrollbar { width: 6px; }
 #lista-usuarios::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
@@ -210,7 +209,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* Tarjeta de cada Post */
 .tarjeta-post {
     background: #ffffff;
     border-radius: 12px;
@@ -226,7 +224,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Cabecera del Post (Avatar y Nombre) */
 .post-header {
     display: flex;
     align-items: center;
@@ -263,7 +260,6 @@ body {
     margin-top: 2px;
 }
 
-/* Cuerpo del Post */
 .post-body {
     padding: 20px;
 }
@@ -281,7 +277,6 @@ body {
     font-size: 15px;
 }
 
-/* Sección de Comentarios */
 .post-comentarios {
     padding: 15px 20px;
     background: #f9f9f9;
@@ -334,3 +329,112 @@ textarea { resize: vertical; min-height: 90px; }
 .btn-danger { background: #dc3545; }
 .btn-danger:hover { background: #c82333; }
 .btn-sm { padding: 4px 8px; font-size: 11px; margin-left: 5px; }
+
+
+/* =========================================
+   RESPONSIVE DESIGN (PARA CELULARES)
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* 1. Ajustes generales y del Login */
+    body { 
+        padding: 10px; 
+    }
+
+    .body-center {
+        min-height: 100vh; /* Ocupa toda la pantalla del celular */
+        padding: 15px 0; /* Evita que se pegue a los bordes */
+    }
+
+    .panel-auth {
+        padding: 20px 15px;
+        width: 95%; /* Un poco más ancho en celular */
+        max-width: 100%;
+        margin: auto;
+    }
+
+    .panel-titulo { font-size: 24px; }
+    .panel-subtitulo { font-size: 14px; }
+    
+    input, textarea {
+        font-size: 16px; /* Evita que el celular haga zoom automático al escribir */
+        padding: 12px;
+    }
+
+    /* 2. Ajustes del Header Superior */
+    .header-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .usuario-info-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    /* 3. Ajustes del Chat (Se apila verticalmente) */
+    .chat-container {
+        flex-direction: column; /* Pone la lista arriba y los mensajes abajo */
+        height: auto;
+        gap: 15px;
+    }
+
+    .chat-sidebar {
+        width: 100%;
+        height: 250px; /* Le da una altura fija a la lista de contactos */
+    }
+
+    .chat-main {
+        height: 60vh; /* Los mensajes ocupan el resto de la pantalla */
+    }
+
+    .mensaje-burbuja {
+        max-width: 95%; /* Las burbujas ocupan casi todo el ancho */
+    }
+
+    /* 4. Ajustes del Blog y Foro */
+    .contenedor-principal {
+        padding-bottom: 20px;
+    }
+
+    .tarjeta-formulario {
+        padding: 15px;
+    }
+
+    .post-header {
+        padding: 10px 15px;
+    }
+
+    .post-body {
+        padding: 15px;
+    }
+
+    .post-titulo {
+        font-size: 18px;
+    }
+
+    .input-comentario {
+        flex-direction: column; /* El botón de comentar se va abajo del input */
+    }
+
+    .input-comentario input {
+        margin-bottom: 10px;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+}
+
+/* Ajustes extra para celulares muy pequeños */
+@media (max-width: 400px) {
+    .avatar-grid {
+        grid-template-columns: repeat(4, 1fr); /* Reduce la grilla de avatares a 4 columnas */
+    }
+    
+    .titulo-dashboard {
+        font-size: 22px;
+    }
+}
