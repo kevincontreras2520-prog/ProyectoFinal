@@ -9,6 +9,7 @@ if (!isset($_SESSION['usuario_id'])) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú Principal</title>
     <link rel="stylesheet" href="css/css.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
