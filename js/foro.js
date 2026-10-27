@@ -1,7 +1,13 @@
 let temaActualId = null;
 
+// Función para evitar inyección de código (XSS)
+function escaparHTML(str) {
+    return String(str || '').replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+}
+
 function cargarHilos() {
-    // Ocultar la vista de respuestas y mostrar la lista de temas
     const vistaTemas = document.getElementById('vista-temas');
     const vistaRespuestas = document.getElementById('vista-respuestas');
     if (vistaTemas) vistaTemas.style.display = 'block';
@@ -18,13 +24,11 @@ function cargarHilos() {
             
             if (data.hilos && data.hilos.length > 0) {
                 data.hilos.forEach(hilo => {
-                    // Usamos data-titulo para no romper el HTML con títulos especiales
                     caja.innerHTML += `
                         <div class="tarjeta-post" style="padding: 15px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
                             
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                <!-- El clic para abrir el tema está en el título -->
-                                <h3 style="margin: 0; color: #007bff; flex: 1;" onclick="abrirTema(${hilo.id}, this.innerText)">${hilo.titulo}</h3>
+                                <h3 style="margin: 0; color: #007bff; flex: 1;" onclick="abrirTema(${hilo.id}, this.innerText)">${escaparHTML(hilo.titulo)}</h3>
                                 
                                 <div style="display: flex; gap: 8px; flex-shrink: 0;">
                                     <button onclick="abrirTema(${hilo.id}, this.parentElement.parentElement.querySelector('h3').innerText)" class="btn btn-primary btn-sm">💬 Ver Hilo</button>
@@ -32,8 +36,8 @@ function cargarHilos() {
                                 </div>
                             </div>
 
-                            <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${hilo.contenido}</p>
-                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${hilo.nombre || hilo.autor}</b> el ${hilo.fecha_creacion}</small>
+                            <p style="margin-top: 0; margin-bottom: 10px; color: #444;">${escaparHTML(hilo.contenido)}</p>
+                            <small style="color:gray;">Creado por <b>${hilo.avatar || '👤'} ${escaparHTML(hilo.nombre || hilo.autor)}</b> el ${hilo.fecha_creacion}</small>
                         </div>`;
                 });
             } else {
@@ -82,10 +86,6 @@ function borrarHilo(id) {
     });
 }
 
-// ==========================================
-// NUEVAS FUNCIONES PARA LOS HILOS (RESPUESTAS)
-// ==========================================
-
 function abrirTema(id, titulo) {
     temaActualId = id;
     document.getElementById('vista-temas').style.display = 'none';
@@ -117,12 +117,14 @@ function cargarRespuestas(tema_id) {
             if (data.respuestas && data.respuestas.length > 0) {
                 data.respuestas.forEach(resp => {
                     caja.innerHTML += `
-                        <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee;">
-                            <div style="margin-bottom: 5px;">
-                                <b>${resp.avatar || '👤'} ${resp.nombre}</b> 
+                        <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid #eee; position: relative;">
+                            <div style="margin-bottom: 5px; padding-right: 30px;">
+                                <b>${resp.avatar || '👤'} ${escaparHTML(resp.nombre)}</b> 
                                 <small style="color:#888; margin-left: 10px;">${resp.fecha_creacion}</small>
+                                <!-- Botón para borrar respuesta -->
+                                <button onclick="borrarRespuesta(${resp.id})" class="btn btn-danger btn-sm" style="position: absolute; right: 10px; top: 10px; padding: 0 5px; font-size: 10px;">x</button>
                             </div>
-                            <div style="color:#333;">${resp.contenido}</div>
+                            <div style="color:#333;">${escaparHTML(resp.contenido)}</div>
                         </div>`;
                 });
             } else {
@@ -149,6 +151,26 @@ function enviarRespuesta() {
         if (!data.error) {
             input.value = '';
             cargarRespuestas(temaActualId);
+        } else {
+            alert(data.mensaje);
+        }
+    });
+}
+
+// NUEVO: Función para borrar una respuesta individual
+function borrarRespuesta(id) {
+    if (!confirm("¿Eliminar esta respuesta del foro?")) return;
+    
+    fetch('api/index.php?modulo=foro&accion=borrar_respuesta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ comentario_id: id })
+    })
+    .then(res => res.json())
+    .then(data => { 
+        if (!data.error) {
+            cargarRespuestas(temaActualId); 
         } else {
             alert(data.mensaje);
         }
